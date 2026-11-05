@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 기장 이웃 커뮤니티</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 웹 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 사용자 공통 컴포넌트 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] },
+                    colors: {
+                        rosegold: {
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c', 800: '#6c4a4a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #FAFAFA; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-marquee { animation: marquee 35s linear infinite; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
+
+    <!-- 공통 네비게이션 헤더 -->
+    <public-nav active="index"></public-nav>
+
+    <main class="flex-1 pt-20 sm:pt-24 animate-[fadeIn_0.5s_ease-out]">
+        
+        <!-- 1. 상단 인트로 & 비주얼 헤더 (max-w-7xl 와이드 정렬) -->
+        <section class="bg-gradient-to-r from-[#FAD0B9] via-[#FFC4D9] to-[#FCA8D0] relative pt-10 sm:pt-16 pb-24 sm:pb-32 px-4 sm:px-6 overflow-hidden">
+            <div class="absolute right-10 bottom-10 w-44 h-44 border-[6px] border-white/40 rounded-full border-dashed animate-[spin_20s_linear_infinite]"></div>
+            <div class="absolute -left-10 top-10 w-28 h-28 bg-white/30 rounded-full blur-xl"></div>
+            
+            <div class="max-w-7xl mx-auto relative z-10 text-center sm:text-left">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 text-xs sm:text-sm font-bold mb-3.5 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-rosegold-500 animate-pulse"></span>
+                    부산 기장 이웃 아카이브
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 leading-[1.25] tracking-tight text-gray-900 break-keep">
+                    우리가 함께 엮어가는<br>
+                    기장 이웃의 따뜻한 발자취
+                </h1>
+
+                <p class="text-sm sm:text-base text-gray-800 font-medium leading-relaxed max-w-2xl mb-6 break-keep">
+                    주말 아침 작은 솜씨를 나누고, 골목길 안부를 묻던 소소한 모임들이 모여 지금의 이야기를 만듭니다. 그 뒤로 남겨진 소중한 활동들을 이곳에 차곡차곡 기록합니다.
+                </p>
+
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                    <a href="intro.html" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-800 transition shadow-sm flex items-center gap-1.5">
+                        부산이음 이야기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <a href="club.html" class="px-5 py-2.5 bg-white/90 text-gray-800 rounded-xl text-xs sm:text-sm font-bold hover:bg-white transition shadow-sm">
+                        동아리 둘러보기
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 플로팅 검색바 (max-w-7xl 와이드 정렬 일치) -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-12 relative z-20 mb-8 sm:mb-10">
+            <div class="bg-white rounded-2xl sm:rounded-full shadow-[0_10px_40px_rgb(0,0,0,0.1)] p-1.5 sm:p-2 flex flex-col sm:flex-row items-center border border-gray-100">
+                <div class="bg-gray-900 text-white px-5 py-3 rounded-xl sm:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm w-full sm:w-auto flex-shrink-0 gap-1.5 shadow-sm">
+                    맞춤 검색 <i data-lucide="search" class="w-3.5 h-3.5 text-rosegold-300"></i>
+                </div>
+                
+                <div class="flex-1 flex flex-col sm:flex-row items-center divide-y sm:divide-y-0 sm:divide-x divide-gray-100 w-full mt-2 sm:mt-0">
+                    <div class="w-full sm:w-auto flex-1 flex items-center px-4 py-2.5 sm:py-0">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-blue-400 mr-2 flex-shrink-0"></i>
+                        <select id="search-region" class="w-full bg-transparent text-xs sm:text-sm font-bold text-gray-600 outline-none cursor-pointer">
+                            <option value="">기장군 전체</option>
+                            <option value="정관">정관읍</option>
+                            <option value="일광">일광읍</option>
+                            <option value="기장">기장읍</option>
+                        </select>
+                    </div>
+                    <div class="w-full sm:w-auto flex-1 flex items-center px-4 py-2.5 sm:py-0">
+                        <i data-lucide="layers" class="w-4 h-4 text-pink-400 mr-2 flex-shrink-0"></i>
+                        <select id="search-category" class="w-full bg-transparent text-xs sm:text-sm font-bold text-gray-600 outline-none cursor-pointer">
+                            <option value="club">동아리 모임</option>
+                            <option value="market">동네 소식 (카페/맛집/나들이)</option>
+                        </select>
+                    </div>
+                    <div class="w-full sm:w-[35%] flex items-center px-4 py-2.5 sm:py-0">
+                        <input type="text" id="search-keyword" placeholder="검색어를 입력해 주세요" class="w-full bg-transparent text-xs sm:text-sm font-bold text-gray-800 outline-none placeholder-gray-400">
+                    </div>
+                </div>
+                
+                <button onclick="handleMainSearch()" class="bg-gray-900 text-white px-8 py-3 rounded-xl sm:rounded-full hover:bg-black transition font-bold text-xs sm:text-sm w-full sm:w-auto mt-2 sm:mt-0 shadow-sm whitespace-nowrap">
+                    검색
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. 핵심 활동 지표 바 (max-w-7xl 와이드 정렬 일치) -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-10 sm:mb-12">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5 sm:p-6 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm">
+                <div class="border-r border-gray-100 pr-2">
+                    <span class="text-xs text-gray-400 font-bold block mb-0.5">기록된 동아리</span>
+                    <span class="text-xl sm:text-2xl font-black text-gray-900" id="stat-club-count">-</span>
+                    <span class="text-xs text-gray-500 font-semibold ml-0.5">개</span>
+                </div>
+                <div class="sm:border-r border-gray-100 pr-2">
+                    <span class="text-xs text-gray-400 font-bold block mb-0.5">나눈 동네 소식</span>
+                    <span class="text-xl sm:text-2xl font-black text-gray-900" id="stat-market-count">-</span>
+                    <span class="text-xs text-gray-500 font-semibold ml-0.5">건</span>
+                </div>
+                <div class="border-r border-gray-100 pr-2 pt-3 sm:pt-0 border-t sm:border-t-0">
+                    <span class="text-xs text-gray-400 font-bold block mb-0.5">참여 만족도</span>
+                    <span class="text-xl sm:text-2xl font-black text-rosegold-500">100%</span>
+                </div>
+                <div class="pt-3 sm:pt-0 border-t sm:border-t-0">
+                    <span class="text-xs text-gray-400 font-bold block mb-0.5">활동 거점</span>
+                    <span class="text-sm sm:text-base font-black text-gray-800 mt-1 block truncate">기장군 전역</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🌟 4. [와이드 확장] 부산이음 소개 섹션: max-w-7xl로 하단 목록과 그리드 라인 100% 일치 -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
+            <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-gray-100 p-6 sm:p-10 md:p-12 shadow-sm">
+                <!-- 상단 타이틀 -->
+                <div class="max-w-3xl mb-8 sm:mb-10">
+                    <span class="text-xs font-bold text-rosegold-500 uppercase tracking-wider block mb-1.5">ABOUT BUSAN-IEUM</span>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 tracking-tight leading-snug break-keep mb-3">
+                        작은 재능과 정성이 모여,<br class="hidden sm:block"> 우리 동네의 따뜻한 온기가 됩니다.
+                    </h2>
+                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed font-medium break-keep">
+                        부산이음은 기장군 이웃들이 모여 각자의 손재주와 취미를 나누고, 소소한 일상과 골목길 소식을 기록하는 열린 주민 공동체 공간입니다. 혼자 하기 어려웠던 활동도 이웃과 함께라면 즐거운 일상이 됩니다.
+                    </p>
+                </div>
+
+                <!-- 3대 핵심 분야 카드 그리드 (와이드 레이아웃 최적화) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8">
+                    <div class="p-6 sm:p-7 rounded-2xl bg-pink-50/60 border border-pink-100/80 flex flex-col hover:border-pink-200 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-4">
+                            <i data-lucide="scissors" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-black text-lg text-gray-900 mb-1.5">손수 (만들기)</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed font-medium flex-1">
+                            공예, 뜨개질, 천연비누 등 정성으로 빚어내는 배움과 나눔 활동
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-7 rounded-2xl bg-blue-50/60 border border-blue-100/80 flex flex-col hover:border-blue-200 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                            <i data-lucide="activity" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-black text-lg text-gray-900 mb-1.5">몸소 (활동)</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed font-medium flex-1">
+                            플로깅, 해안길 걷기, 나들이를 통한 건강과 삶의 활력 채우기
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-7 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col hover:border-amber-200 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4">
+                            <i data-lucide="coffee" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-black text-lg text-gray-900 mb-1.5">우리기장 (소식)</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed font-medium flex-1">
+                            이웃들이 직접 발로 뛰며 추천하는 진짜 맛집과 카페, 나들이 이야기
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 하단 액션 안내 바 -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100 text-xs sm:text-sm">
+                    <span class="text-gray-500 font-medium text-center sm:text-left">지금 바로 마음에 드는 모임을 찾거나, 새로운 소식을 전해보세요.</span>
+                    <div class="flex items-center gap-3">
+                        <a href="intro.html" class="font-bold text-gray-700 hover:text-gray-900 underline underline-offset-4 px-2 py-1">자세한 소개 보기</a>
+                        <a href="club.html" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition shadow-sm">동아리 참여하기 →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 요즘 뜨는 동아리 (기차 릴레이: max-w-7xl 정렬 유지) -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
+            <div class="flex items-center justify-between mb-5 sm:mb-6">
+                <h2 class="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-2 tracking-tight">
+                    <i data-lucide="flame" class="text-rosegold-500 w-5 h-5 sm:w-6 sm:h-6"></i>
+                    요즘 뜨는 동아리
+                </h2>
+                <a href="club.html" class="text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1 bg-white px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm border border-gray-200">
+                    전체 보기 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+            
+            <div class="overflow-hidden w-full relative group">
+                <div id="preview-club-list" class="flex w-max group-hover:[animation-play-state:paused]">
+                    <div class="w-[calc(100vw-2rem)] max-w-7xl mx-auto py-10 text-center text-gray-400 text-sm font-bold bg-white rounded-2xl border border-gray-200 whitespace-normal">
+                        인기 동아리를 불러오는 중입니다...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 최신 소식 섹션 (max-w-7xl 정렬 유지) -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20">
+            <div class="flex items-center justify-between mb-5 sm:mb-6">
+                <h2 class="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-2 tracking-tight">
+                    <i data-lucide="bell-ring" class="text-rosegold-500 w-5 h-5 sm:w-6 sm:h-6"></i>
+                    최신 동네 소식
+                </h2>
+                <a href="market.html" class="text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-1 bg-white px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm border border-gray-200">
+                    전체 보기 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="preview-market-list">
+                <div class="col-span-full py-10 text-center text-gray-400 text-sm font-bold bg-white rounded-2xl border border-gray-200 whitespace-normal">
+                    최신 소식을 불러오는 중입니다...
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 공통 푸터 & 모달 -->
+    <public-footer></public-footer>
+    <public-modals></public-modals>
+
+    <!-- 메인 팝업 배너 모달 -->
+    <div id="modal-main-popup" class="fixed inset-0 bg-black/70 z-[200] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-sm sm:max-w-md relative flex flex-col animate-[fadeIn_0.3s_ease-out]">
+            <button onclick="closeMainPopup()" class="absolute top-3 right-3 z-30 bg-black/50 hover:bg-black/80 text-white rounded-full p-1.5 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden">
+                <a id="popup-link" href="javascript:void(0);" target="_blank" class="block w-full h-full">
+                    <img id="popup-image" src="" alt="팝업 배너" class="w-full h-full object-cover">
+                    <video id="popup-video" src="" autoplay loop muted playsinline class="w-full h-full object-cover hidden"></video>
+                    <div id="popup-fallback" class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-rosegold-50 text-gray-800 hidden">
+                        <i data-lucide="bell" class="w-12 h-12 text-rosegold-500 mb-3"></i>
+                        <h4 id="popup-title" class="font-black text-xl mb-2">부산이음 공지사항</h4>
+                    </div>
+                </a>
+                <button id="popup-prev-btn" onclick="prevPopup()" class="absolute left-2.5 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md z-20 hidden">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <button id="popup-next-btn" onclick="nextPopup()" class="absolute right-2.5 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md z-20 hidden">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+                <div id="popup-indicator" class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-bold px-2.5 py-1 rounded-full z-20 hidden">
+                    1 / 1
+                </div>
+            </div>
+            <div class="bg-gray-900 text-white px-5 py-3.5 flex items-center justify-between text-xs font-bold">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" id="popup-hide-today" class="rounded text-rosegold-500 focus:ring-0">
+                    <span>오늘 하루 보지 않기</span>
+                </label>
+                <button onclick="closeMainPopup()" class="hover:text-rosegold-300 transition">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 파이어베이스 스크립트 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, collection, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAoiX0R0hJoWYqyy52Y6sFWIxwPoljR_7k", 
+            authDomain: "talent.unifactory.kr", 
+            projectId: "talent-af055", 
+            storageBucket: "talent-af055.firebasestorage.app", 
+            messagingSenderId: "476130735120", 
+            appId: "1:476130735120:web:aae71ccf3e626152e40695", 
+            measurementId: "G-1XSNXNNGMH" 
+        };
+        
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app); 
+        const auth = getAuth(app); 
+        const appId = 'talent-af055'; 
+        
+        lucide.createIcons();
+
+        // 검색 처리
+        window.handleMainSearch = () => {
+            const cat = document.getElementById('search-category').value;
+            const kw = document.getElementById('search-keyword').value.trim();
+            const targetPage = cat === 'market' ? 'market.html' : 'club.html';
+            location.href = `${targetPage}?keyword=${encodeURIComponent(kw)}`;
+        };
+
+        // 인증 상태 감지
+        onAuthStateChanged(auth, async (user) => {
+            const btn = document.getElementById('btn-login');
+            const prof = document.getElementById('user-profile');
+
+            if (user && !user.isAnonymous) {
+                if(btn) btn.classList.add('hidden'); 
+                if(prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
+                
+                let name = user.displayName;
+                try {
+                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                    if (profileDoc.exists()) {
+                        name = profileDoc.data().nickname || profileDoc.data().name || name;
+                    }
+                } catch (e) { console.error(e); }
+                
+                name = name || '이웃';
+                window.currentUserName = name;
+                const nameEl = document.getElementById('user-name');
+                const avatarEl = document.getElementById('user-avatar');
+                if(nameEl) nameEl.textContent = name + " 님";
+                if(avatarEl) avatarEl.textContent = name.charAt(0);
+            } else {
+                if(btn) btn.classList.remove('hidden'); 
+                if(prof) prof.classList.add('hidden');
+                if(!user) { signInAnonymously(auth).catch(() => {}); }
+            }
+        });
+
+        // 실시간 동아리 & 소식 미리보기 로드
+        const loadPreviewData = () => {
+            // 1. 동아리 릴레이
+            const clubsRef = collection(db, 'artifacts', appId, 'public', 'data', 'clubs');
+            onSnapshot(clubsRef, (snapshot) => {
+                let clubs = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if(data.status === 'active') clubs.push({ id: docSnap.id, ...data });
+                });
+                
+                const statEl = document.getElementById('stat-club-count');
+                if (statEl) statEl.textContent = clubs.length;
+
+                const clubContainer = document.getElementById('preview-club-list');
+                if(clubs.length === 0) {
+                    clubContainer.innerHTML = '<div class="w-[calc(100vw-2rem)] max-w-7xl mx-auto py-10 text-center text-gray-400 text-sm font-bold bg-white rounded-2xl border border-gray-200 whitespace-normal">개설된 동아리가 없습니다.</div>';
+                    clubContainer.classList.remove('animate-marquee');
+                } else {
+                    const fallback = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800';
+                    const cardsHtml = clubs.map(club => {
+                        const imgSrc = (club.imageUrl && club.imageUrl.length > 10) ? club.imageUrl : fallback;
+                        return `
+                        <div onclick="location.href='activity.html?id=${club.id}'" class="mr-4 sm:mr-5 w-[260px] sm:w-[290px] flex-shrink-0 bg-white border border-gray-100 rounded-3xl p-4 sm:p-5 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col">
+                            <div class="w-full h-32 sm:h-40 bg-gray-50 rounded-2xl overflow-hidden relative mb-3.5">
+                                <img src="${imgSrc}" onerror="this.onerror=null; this.src='${fallback}';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-2.5 right-2.5 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-black text-gray-800 shadow-sm">
+                                    모집중
+                                </div>
+                            </div>
+                            <div class="flex flex-col flex-1">
+                                <h4 class="font-black text-base sm:text-lg text-gray-900 group-hover:text-rosegold-600 transition truncate mb-2">${club.name || club.title || '동아리'}</h4>
+                                <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-100 text-xs font-bold text-gray-500">
+                                    <span class="flex items-center gap-1.5">
+                                        <div class="w-5 h-5 rounded-full bg-rosegold-50 text-rosegold-600 flex items-center justify-center text-[10px] font-black">${(club.leaderName || '이').charAt(0)}</div>
+                                        ${club.leaderName || '이웃'} 님
+                                    </span>
+                                    <span class="text-rosegold-500 font-extrabold">활동보기 →</span>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+
+                    if (clubs.length >= 3) {
+                        clubContainer.innerHTML = cardsHtml + cardsHtml;
+                        clubContainer.classList.add('animate-marquee');
+                    } else {
+                        clubContainer.innerHTML = cardsHtml;
+                        clubContainer.classList.remove('animate-marquee');
+                    }
+                    lucide.createIcons();
+                }
+            });
+
+            // 2. 최신 우리기장 소식
+            const marketRef = collection(db, 'artifacts', appId, 'public', 'data', 'market');
+            onSnapshot(marketRef, (snapshot) => {
+                let posts = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if(data.status !== 'hidden' && data.status !== 'pending') {
+                        posts.push({ id: docSnap.id, ...data });
+                    }
+                });
+
+                const statMarketEl = document.getElementById('stat-market-count');
+                if (statMarketEl) statMarketEl.textContent = posts.length;
+
+                posts.sort((a, b) => (b.createdAt?.toMillis ? b.createdAt.toMillis() : 0) - (a.createdAt?.toMillis ? a.createdAt.toMillis() : 0));
+                const recentPosts = posts.slice(0, 3);
+                const marketContainer = document.getElementById('preview-market-list');
+
+                if(recentPosts.length === 0) {
+                    marketContainer.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 text-sm font-bold bg-white rounded-2xl border border-gray-200">등록된 동네 소식이 없습니다.</div>';
+                } else {
+                    const fallback = 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800';
+                    marketContainer.innerHTML = recentPosts.map(post => {
+                        const imgSrc = (post.imageUrl && post.imageUrl.length > 10) ? post.imageUrl : fallback;
+                        const catMap = { cafe: '☕ 카페 추천', food: '🍽️ 맛집 추천', tour: '🌳 나들이' };
+                        return `
+                        <div onclick="location.href='market.html'" class="bg-white border border-gray-100 rounded-3xl p-5 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col h-full">
+                            <div class="w-full h-36 bg-gray-50 rounded-2xl overflow-hidden relative mb-3.5">
+                                <img src="${imgSrc}" onerror="this.onerror=null; this.src='${fallback}';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold text-gray-800 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">
+                                    ${catMap[post.category] || '소식'}
+                                </span>
+                            </div>
+                            <h4 class="font-black text-base sm:text-lg text-gray-900 mb-1.5 truncate group-hover:text-rosegold-600 transition">${post.title}</h4>
+                            <p class="text-xs text-gray-500 line-clamp-2 mb-3 flex-1 leading-relaxed font-medium">${post.content}</p>
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto text-xs font-bold text-gray-400">
+                                <span>${post.authorName || '이웃'} 님</span>
+                                <span class="text-rosegold-500 font-extrabold">자세히 보기 →</span>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                    lucide.createIcons();
+                }
+            });
+        };
+
+        // 팝업 배너
+        let activePopups = [];
+        let currentPopupIndex = 0;
+        let popupSlideInterval;
+
+        const startPopupAutoSlide = () => {
+            if (popupSlideInterval) clearInterval(popupSlideInterval);
+            if (activePopups.length > 1) {
+                popupSlideInterval = setInterval(() => { window.nextPopup(); }, 4000);
+            }
+        };
+
+        const stopPopupAutoSlide = () => {
+            if (popupSlideInterval) { clearInterval(popupSlideInterval); popupSlideInterval = null; }
+        };
+
+        const loadMainPopup = () => {
+            const hideUntil = localStorage.getItem('hideMainPopupUntil');
+            if (hideUntil && new Date().getTime() < parseInt(hideUntil)) return;
+
+            const bannersRef = collection(db, 'artifacts', appId, 'public', 'data', 'banners');
+            onSnapshot(bannersRef, (snapshot) => {
+                activePopups = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.status === 'active') activePopups.push({ id: docSnap.id, ...data });
+                });
+
+                activePopups.sort((a, b) => (parseInt(a.order) || 1) - (parseInt(b.order) || 1));
+
+                if (activePopups.length > 0) {
+                    currentPopupIndex = 0;
+                    renderCurrentPopup();
+                    document.getElementById('modal-main-popup').classList.remove('hidden');
+                    startPopupAutoSlide();
+                }
+            });
+        };
+
+        window.renderCurrentPopup = () => {
+            if (activePopups.length === 0) return;
+            const banner = activePopups[currentPopupIndex];
+            const imgEl = document.getElementById('popup-image');
+            const vidEl = document.getElementById('popup-video');
+            const linkEl = document.getElementById('popup-link');
+            const fallbackEl = document.getElementById('popup-fallback');
+
+            if (banner.imageUrl) {
+                if (banner.mediaType === 'video' || banner.imageUrl.startsWith('data:video')) {
+                    imgEl.classList.add('hidden'); vidEl.src = banner.imageUrl; vidEl.classList.remove('hidden');
+                } else {
+                    vidEl.classList.add('hidden'); imgEl.src = banner.imageUrl; imgEl.classList.remove('hidden');
+                }
+                fallbackEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden'); vidEl.classList.add('hidden'); fallbackEl.classList.remove('hidden');
+                document.getElementById('popup-title').innerText = banner.title || '부산이음 공지사항';
+            }
+
+            linkEl.href = banner.linkUrl || 'javascript:void(0);';
+
+            const prevBtn = document.getElementById('popup-prev-btn');
+            const nextBtn = document.getElementById('popup-next-btn');
+            const indicator = document.getElementById('popup-indicator');
+
+            if (activePopups.length > 1) {
+                prevBtn.classList.remove('hidden'); nextBtn.classList.remove('hidden'); indicator.classList.remove('hidden');
+                indicator.innerText = `${currentPopupIndex + 1} / ${activePopups.length}`;
+            } else {
+                prevBtn.classList.add('hidden'); nextBtn.classList.add('hidden'); indicator.classList.add('hidden');
+            }
+        };
+
+        window.prevPopup = () => {
+            currentPopupIndex = (currentPopupIndex - 1 + activePopups.length) % activePopups.length;
+            renderCurrentPopup(); startPopupAutoSlide();
+        };
+        window.nextPopup = () => {
+            currentPopupIndex = (currentPopupIndex + 1) % activePopups.length;
+            renderCurrentPopup(); startPopupAutoSlide();
+        };
+        window.closeMainPopup = () => {
+            if (document.getElementById('popup-hide-today').checked) {
+                const tomorrow = new Date().getTime() + (24 * 60 * 60 * 1000);
+                localStorage.setItem('hideMainPopupUntil', tomorrow.toString());
+            }
+            stopPopupAutoSlide();
+            document.getElementById('modal-main-popup').classList.add('hidden');
+        };
+
+        loadPreviewData();
+        loadMainPopup();
+    </script>
+</body>
+</html>

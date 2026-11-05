@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 동네 소식 관리</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 웹 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 🌟 공통 메뉴/헤더/로그인 컴포넌트 불러오기 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        rosegold: {
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c',
+                            800: '#6c4a4a', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 부드러운 스크롤바 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #e58e8e; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97777; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- 🌟 1. 공통 사이드바 컴포넌트 -->
+    <admin-sidebar active="market"></admin-sidebar>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden w-full">
+        
+        <!-- 🌟 2. 공통 헤더 컴포넌트 -->
+        <admin-header title="동네 소식 관리"></admin-header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                        <i data-lucide="layers" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">전체 등록된 소식</p>
+                        <h3 id="stat-total-posts" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-500 flex-shrink-0">
+                        <i data-lucide="alert-circle" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">노출 승인 대기</p>
+                        <h3 id="stat-pending-posts" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 flex-shrink-0">
+                        <i data-lucide="check-circle" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">현재 노출 중</p>
+                        <h3 id="stat-active-posts" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <select class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 상태</option>
+                        <option value="pending">승인 대기</option>
+                        <option value="active">노출 중</option>
+                        <option value="hidden">숨김</option>
+                    </select>
+
+                    <div class="relative w-full sm:w-auto mt-2 sm:mt-0">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="제목, 내용 검색" class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-rosegold-300 shadow-sm w-full sm:w-64 md:w-80 transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 소식 목록 테이블 영역 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100">
+                                <th class="px-6 py-4 font-medium w-12 text-center">
+                                    <input type="checkbox" id="check-all" onchange="toggleAll(this)" class="rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500 cursor-pointer">
+                                </th>
+                                <th class="px-6 py-4 font-medium w-24 text-center">분류</th>
+                                <th class="px-6 py-4 font-medium">제목 및 내용</th>
+                                <th class="px-6 py-4 font-medium">작성자</th>
+                                <th class="px-6 py-4 font-medium">등록일</th>
+                                <th class="px-6 py-4 font-medium text-center">상태</th>
+                                <th class="px-6 py-4 font-medium text-center">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-list-body" class="text-sm text-gray-700">
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-gray-500 font-medium">
+                                    데이터를 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button onclick="activateSelected()" class="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-200 text-emerald-600 text-sm font-bold rounded-lg hover:bg-emerald-50 transition shadow-sm whitespace-nowrap">선택 노출 승인</button>
+                <button onclick="hideSelected()" class="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 transition shadow-sm whitespace-nowrap">선택 숨김 처리</button>
+                <button onclick="deleteSelected()" class="w-full sm:w-auto px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-bold rounded-lg hover:bg-red-50 transition shadow-sm whitespace-nowrap mt-2 sm:mt-0">선택 삭제</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- 🌟 3. 공통 로그인 모달 컴포넌트 -->
+    <admin-login-modal></admin-login-modal>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <script type="module">
+        import { db, auth, appId } from '../firebase-config.js';
+        import { collection, onSnapshot, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        window.openLoginModal = () => document.getElementById('modal-login').classList.remove('hidden');
+        window.closeLoginModal = () => document.getElementById('modal-login').classList.add('hidden');
+
+        window.logoutAdmin = () => {
+            if(confirm("관리자 계정에서 로그아웃 하시겠습니까?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
+
+        window.toggleAll = (source) => {
+            const checkboxes = document.querySelectorAll('.post-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        };
+
+        const getSelectedIds = () => {
+            const checkboxes = document.querySelectorAll('.post-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        };
+
+        window.activateSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("활성화할 소식을 먼저 선택해주세요.");
+            if (!confirm(`선택한 ${ids.length}개의 소식을 '노출 중' 상태로 일괄 변경하시겠습니까?`)) return;
+
+            try {
+                for (const id of ids) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'market', id), { status: 'active' });
+                }
+                alert("✅ 노출 승인 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다. 관리자 권한을 확인해주세요.");
+            }
+        };
+
+        window.hideSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("숨김 처리할 소식을 먼저 선택해주세요.");
+            if (!confirm(`선택한 ${ids.length}개의 소식을 숨김 처리하시겠습니까?`)) return;
+
+            try {
+                for (const id of ids) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'market', id), { status: 'hidden' });
+                }
+                alert("✅ 숨김 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다.");
+            }
+        };
+
+        window.deleteSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("삭제할 소식을 먼저 선택해주세요.");
+            if (!confirm(`경고: 선택한 ${ids.length}개의 소식 데이터를 완전히 삭제합니다. 진행할까요?`)) return;
+
+            try {
+                for (const id of ids) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'market', id));
+                }
+                alert("🗑️ 삭제 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다.");
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const tbody = document.getElementById('market-list-body');
+            if (user && user.email === 'admin@internal.system') {
+                startListening();
+            } else {
+                if(tbody) tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-20 text-center text-gray-400 font-medium italic">관리자 로그인이 필요합니다. 상단의 로그인 버튼을 눌러주세요.</td></tr>';
+                openLoginModal();
+            }
+        });
+
+        const startListening = () => {
+            const marketRef = collection(db, 'artifacts', appId, 'public', 'data', 'market');
+            onSnapshot(marketRef, (snapshot) => {
+                const posts = [];
+                let pendingCount = 0;
+                let activeCount = 0;
+
+                snapshot.forEach(docSnap => { 
+                    const data = docSnap.data();
+                    posts.push({ id: docSnap.id, ...data }); 
+                    if(data.status === 'pending') pendingCount++;
+                    if(data.status === 'active') activeCount++;
+                });
+
+                posts.sort((a, b) => {
+                    if (a.status === 'pending' && b.status !== 'pending') return -1;
+                    if (a.status !== 'pending' && b.status === 'pending') return 1;
+                    const tA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
+                    const tB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
+                    return tB - tA;
+                });
+
+                const statTotal = document.getElementById('stat-total-posts');
+                const statPending = document.getElementById('stat-pending-posts');
+                const statActive = document.getElementById('stat-active-posts');
+                if(statTotal) statTotal.innerText = snapshot.size.toLocaleString();
+                if(statPending) statPending.innerText = pendingCount.toLocaleString();
+                if(statActive) statActive.innerText = activeCount.toLocaleString();
+
+                const tbody = document.getElementById('market-list-body');
+                if (!tbody) return;
+
+                if (posts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-gray-500 font-medium">아직 등록된 동네 소식이 없습니다.</td></tr>`;
+                } else {
+                    tbody.innerHTML = posts.map(post => {
+                        let icon = 'image'; let categoryName = post.category;
+                        if(post.category === 'cafe') { icon = 'coffee'; categoryName = '카페 추천'; }
+                        if(post.category === 'food') { icon = 'utensils'; categoryName = '맛집 추천'; }
+                        if(post.category === 'tour') { icon = 'map'; categoryName = '관광 명소'; }
+                        if(post.category === 'club') { icon = 'users'; categoryName = '동아리 모집'; }
+
+                        let dateStr = '-';
+                        if (post.createdAt && typeof post.createdAt.toDate === 'function') {
+                            const d = post.createdAt.toDate();
+                            dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+                        }
+
+                        let statusBadge = '<span class="px-2 md:px-2.5 py-0.5 md:py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap">노출 중</span>';
+                        if (post.status === 'pending') statusBadge = '<span class="px-2 md:px-2.5 py-0.5 md:py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap">승인 대기</span>';
+                        else if (post.status === 'hidden') statusBadge = '<span class="px-2 md:px-2.5 py-0.5 md:py-1 bg-gray-100 text-gray-500 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap">숨김</span>';
+
+                        const actionButtons = post.status === 'hidden' || post.status === 'pending'
+                                ? `<button onclick="updatePostStatus('${post.id}', 'active')" class="w-full sm:w-auto px-3 md:px-4 py-1.5 md:py-2 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-600 transition shadow-sm text-xs md:text-sm whitespace-nowrap">승인(노출)</button>`
+                                : `<button onclick="updatePostStatus('${post.id}', 'hidden')" class="w-full sm:w-auto px-3 md:px-4 py-1.5 md:py-2 bg-gray-100 text-gray-600 font-bold rounded-lg hover:bg-gray-200 transition text-xs md:text-sm border border-gray-200 whitespace-nowrap">숨기기</button>`;
+
+                        return `
+                            <tr class="border-b border-gray-50 hover:bg-rosegold-50/30 transition ${post.status === 'hidden' ? 'opacity-60 bg-gray-50' : ''}">
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">
+                                    <input type="checkbox" value="${post.id}" class="post-checkbox rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500 cursor-pointer">
+                                </td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">
+                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gray-50 overflow-hidden flex items-center justify-center text-gray-400 border border-gray-100 mx-auto">
+                                        <i data-lucide="${icon}" class="w-5 h-5 md:w-6 md:h-6"></i>
+                                    </div>
+                                    <p class="text-[10px] font-bold text-gray-500 mt-1">${categoryName}</p>
+                                </td>
+                                <td class="px-4 md:px-6 py-3 md:py-4">
+                                    <p class="font-bold text-gray-800 text-sm md:text-base truncate max-w-[150px] sm:max-w-[200px] md:max-w-[300px] mb-0.5" title="${post.title}">${post.title}</p>
+                                    <p class="text-[10px] md:text-xs text-gray-400 truncate max-w-[150px] sm:max-w-[200px] md:max-w-[300px]">${post.content}</p>
+                                </td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 text-xs md:text-sm whitespace-nowrap">${post.authorName || '이웃'}</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-gray-500 text-[10px] md:text-xs whitespace-nowrap">${dateStr}</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">${statusBadge}</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">
+                                    <div class="flex justify-center gap-2">
+                                        ${actionButtons}
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                    lucide.createIcons();
+                }
+            }, (error) => console.error("우리기장 데이터 가져오기 실패:", error));
+        };
+
+        window.updatePostStatus = async (postId, newStatus) => {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'market', postId), { status: newStatus });
+            } catch(e) {
+                console.error(e);
+                alert('상태 변경에 실패했습니다. 관리자 권한을 다시 확인해주세요.');
+            }
+        };
+    </script>
+</body>
+</html>

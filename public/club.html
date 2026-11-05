@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 동아리</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Web Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 사용자 공통 컴포넌트 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] },
+                    colors: { 
+                        rosegold: { 
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c', 800: '#6c4a4a' 
+                        } 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #FAFAFA; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
+
+    <!-- 공통 네비게이션 헤더 -->
+    <public-nav active="club"></public-nav>
+
+    <main class="flex-1 pt-20 sm:pt-24 animate-[fadeIn_0.4s_ease-out]">
+        
+        <!-- 상단 헤더 배너 -->
+        <section class="bg-gradient-to-r from-[#FAD0B9] via-[#FFC4D9] to-[#FCA8D0] pt-12 pb-24 sm:pt-16 sm:pb-28 px-4 sm:px-6 relative overflow-hidden text-center">
+            <div class="max-w-7xl mx-auto relative z-10">
+                <span class="inline-block px-3 py-1 bg-white/70 backdrop-blur-sm rounded-full text-xs font-bold text-gray-800 mb-3 shadow-sm">이웃과 함께하는 취미 공간</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3 tracking-tight">함께하는 동아리</h2>
+                <p class="text-sm sm:text-base text-gray-800 font-medium break-keep">취향이 맞는 이웃들과 모여 일상의 소소한 즐거움을 함께 만들어보세요.</p>
+            </div>
+        </section>
+
+        <!-- 콘텐츠 영역 -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-14 relative z-20 mb-16 sm:mb-20">
+            <div class="space-y-8 sm:space-y-12">
+                
+                <!-- 1. 손수 -->
+                <div class="bg-white p-6 sm:p-8 md:p-10 rounded-[2rem] shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-pink-600">
+                                <i data-lucide="scissors" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-gray-900">손수</h3>
+                                <p class="text-xs text-gray-400 font-medium">내 손으로 직접 만드는 즐거움</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6" id="club-list-son">
+                        <div class="col-span-full py-12 text-center text-gray-400 font-medium text-sm">동아리 목록을 불러오고 있습니다...</div>
+                    </div>
+                </div>
+
+                <!-- 2. 몸소 -->
+                <div class="bg-white p-6 sm:p-8 md:p-10 rounded-[2rem] shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                                <i data-lucide="activity" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-gray-900">몸소</h3>
+                                <p class="text-xs text-gray-400 font-medium">몸으로 직접 느끼는 건강과 활력</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6" id="club-list-mom">
+                        <div class="col-span-full py-12 text-center text-gray-400 font-medium text-sm">동아리 목록을 불러오고 있습니다...</div>
+                    </div>
+                </div>
+
+                <!-- 3. 그 외 -->
+                <div class="bg-white p-6 sm:p-8 md:p-10 rounded-[2rem] shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                <i data-lucide="smile" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-gray-900">그 외 나눔 동아리</h3>
+                                <p class="text-xs text-gray-400 font-medium">다양한 취향과 배움의 공간</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6" id="club-list-etc">
+                        <div class="col-span-full py-12 text-center text-gray-400 font-medium text-sm">동아리 목록을 불러오고 있습니다...</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- 공통 푸터 & 모달 -->
+    <public-footer></public-footer>
+    <public-modals></public-modals>
+
+    <!-- 동아리 신규 등록 모달 -->
+    <div id="modal-club-reg" class="fixed inset-0 bg-black/60 z-[140] hidden flex items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="bg-white w-full max-w-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <button onclick="closeClubModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-5 mt-1 flex items-center gap-2">
+                <i data-lucide="sparkles" class="text-rosegold-500 w-5 h-5"></i> 새 동아리 개설 신청
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">대표 사진 첨부</label>
+                    <p class="text-[11px] text-rosegold-500 font-bold mb-2">※ 권장 규격: 1:1 정방형 또는 4:3 가로형</p>
+                    <button type="button" onclick="document.getElementById('club-photo-input').click()" class="w-full h-40 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 transition group overflow-hidden relative shadow-inner">
+                        <i data-lucide="camera" class="w-8 h-8 mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-xs sm:text-sm">사진 선택하기</span>
+                        <img id="club-photo-preview" class="absolute inset-0 w-full h-full object-cover hidden">
+                    </button>
+                    <input type="file" id="club-photo-input" class="hidden" accept="image/*">
+                </div>
+
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">동아리 분류</label>
+                    <select id="club-category" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm">
+                        <option value="son">✂️ 손수 (공예, 손재주, 요리 등)</option>
+                        <option value="mom">🏃 몸소 (운동, 건강, 나들이 등)</option>
+                        <option value="etc">🌻 그 외 (취미, 학습, 나눔 등)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">동아리 명칭</label>
+                    <input type="text" id="club-title-input" placeholder="예: 봄맞이 뜨개질 모임" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">활동 장소</label>
+                    <input type="text" id="club-place" placeholder="예: 정관읍 주민복지관 또는 하삼동 카페" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-medium text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">소개글 및 활동 안내</label>
+                    <textarea id="club-desc" rows="4" placeholder="어떤 활동을 함께 하는지 소개글을 적어주세요." class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none resize-none text-sm leading-relaxed"></textarea>
+                </div>
+                <button type="button" onclick="submitClub()" class="w-full bg-gray-900 text-white font-black text-base sm:text-lg py-4 rounded-2xl hover:bg-gray-800 transition shadow-md active:scale-95 mt-2">
+                    동아리 개설 신청하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 파이어베이스 스크립트 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAoiX0R0hJoWYqyy52Y6sFWIxwPoljR_7k", 
+            authDomain: "talent.unifactory.kr", 
+            projectId: "talent-af055", 
+            storageBucket: "talent-af055.firebasestorage.app", 
+            messagingSenderId: "476130735120", 
+            appId: "1:476130735120:web:aae71ccf3e626152e40695", 
+            measurementId: "G-1XSNXNNGMH" 
+        };
+        
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app); 
+        const appId = 'talent-af055'; 
+
+        let currentUploadedImage = null;
+
+        lucide.createIcons();
+
+        // 인증 상태 감지 및 네비게이션 동기화
+        onAuthStateChanged(auth, async (user) => {
+            const btn = document.getElementById('btn-login');
+            const prof = document.getElementById('user-profile');
+
+            if (user && !user.isAnonymous) {
+                if (btn) btn.classList.add('hidden');
+                if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
+
+                let name = user.displayName;
+                try {
+                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                    if (profileDoc.exists()) {
+                        name = profileDoc.data().nickname || profileDoc.data().name || name;
+                    }
+                } catch (e) { console.error(e); }
+
+                name = name || '이웃';
+                const nameEl = document.getElementById('user-name');
+                const avatarEl = document.getElementById('user-avatar');
+                if (nameEl) nameEl.textContent = name + " 님";
+                if (avatarEl) avatarEl.textContent = name.charAt(0);
+            } else {
+                if (btn) btn.classList.remove('hidden');
+                if (prof) prof.classList.add('hidden');
+            }
+        });
+
+        // 모달 제어
+        window.openClubModal = () => {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) {
+                alert("동아리를 등록하시려면 먼저 로그인해 주세요! 😊");
+                if (window.openLoginModal) window.openLoginModal();
+            } else {
+                document.getElementById('modal-club-reg').classList.remove('hidden');
+            }
+        };
+
+        window.closeClubModal = () => {
+            document.getElementById('modal-club-reg').classList.add('hidden');
+            currentUploadedImage = null;
+            const preview = document.getElementById('club-photo-preview');
+            if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+            document.getElementById('club-photo-input').value = '';
+        };
+
+        // 이미지 리사이징 업로드 처리
+        const handleImageUpload = (file, callback) => {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.82));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('club-photo-input').addEventListener('change', (e) => {
+            handleImageUpload(e.target.files[0], (data) => {
+                currentUploadedImage = data;
+                const preview = document.getElementById('club-photo-preview');
+                preview.src = data;
+                preview.classList.remove('hidden');
+            });
+        });
+
+        // 동아리 개설 신청 제출
+        window.submitClub = async () => {
+            const user = auth.currentUser;
+            if (!user || user.isAnonymous) return alert("로그인이 필요합니다.");
+
+            const title = document.getElementById('club-title-input').value.trim();
+            const category = document.getElementById('club-category').value;
+            const place = document.getElementById('club-place').value.trim();
+            const desc = document.getElementById('club-desc').value.trim();
+
+            if (!title || !desc) return alert("동아리 명칭과 소개글을 모두 작성해 주세요!");
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clubs'), {
+                    name: title,
+                    title: title,
+                    category,
+                    place: place || '기장군 일대',
+                    intro: desc,
+                    description: desc,
+                    imageUrl: currentUploadedImage || '',
+                    leaderName: user.displayName || '이웃',
+                    leaderId: user.uid,
+                    createdAt: serverTimestamp(),
+                    status: 'active'
+                });
+
+                closeClubModal();
+                alert("🎉 새 동아리가 성공적으로 등록되었습니다!");
+                document.getElementById('club-title-input').value = '';
+                document.getElementById('club-place').value = '';
+                document.getElementById('club-desc').value = '';
+            } catch (err) {
+                console.error(err);
+                alert("등록 중 오류가 발생했습니다.");
+            }
+        };
+
+        // 🌟 [핵심] 카드 클릭 시 activity.html?id=... 로 이동
+        const clubsRef = collection(db, 'artifacts', appId, 'public', 'data', 'clubs');
+        onSnapshot(clubsRef, (snapshot) => {
+            const groups = { son: [], mom: [], etc: [] };
+
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                if (data.status === 'active') {
+                    const item = { id: docSnap.id, ...data };
+                    if (groups[data.category]) {
+                        groups[data.category].push(item);
+                    } else {
+                        groups.etc.push(item);
+                    }
+                }
+            });
+
+            ['son', 'mom', 'etc'].forEach(cat => {
+                const container = document.getElementById(`club-list-${cat}`);
+                if (!container) return;
+
+                if (groups[cat].length === 0) {
+                    container.innerHTML = '<div class="col-span-full py-12 text-center text-gray-400 font-medium text-sm">개설된 동아리가 없습니다. 첫 번째 모임을 만들어보세요!</div>';
+                } else {
+                    container.innerHTML = groups[cat].map(club => {
+                        const fallback = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800';
+                        const imgSrc = (club.imageUrl && club.imageUrl.length > 10) ? club.imageUrl : fallback;
+                        const displayTitle = club.name || club.title || '동아리 모임';
+                        const displayDesc = club.intro || club.description || club.place || '함께 모여 활동해요!';
+
+                        return `
+                        <!-- 🌟 [개선] 레퍼런스 스타일 activity.html 전용 페이지로 이동 -->
+                        <div onclick="location.href='activity.html?id=${club.id}'" class="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-rosegold-300 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full">
+                            <div class="w-full aspect-[4/3] bg-gray-100 overflow-hidden relative flex-shrink-0">
+                                <img src="${imgSrc}" onerror="this.onerror=null; this.src='${fallback}';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-bold text-gray-800 shadow-sm">
+                                    모집중
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col flex-1">
+                                <h4 class="font-black text-base sm:text-lg text-gray-900 group-hover:text-rosegold-600 transition truncate mb-1">
+                                    ${displayTitle}
+                                </h4>
+                                <p class="text-xs text-gray-500 font-medium line-clamp-2 leading-relaxed mb-4 flex-1">
+                                    ${displayDesc}
+                                </p>
+                                <div class="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto text-xs font-bold text-gray-400">
+                                    <div class="flex items-center gap-1.5 text-gray-600">
+                                        <div class="w-5 h-5 rounded-full bg-rosegold-50 text-rosegold-600 flex items-center justify-center text-[10px] font-black">${(club.leaderName || '이').charAt(0)}</div>
+                                        <span>${club.leaderName || '이웃'} 님</span>
+                                    </div>
+                                    <span class="text-rosegold-500 font-extrabold group-hover:translate-x-0.5 transition-transform">
+                                        활동 보기 →
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                }
+            });
+
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

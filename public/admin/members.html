@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 회원 관리</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 웹 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 🌟 공통 메뉴/헤더/로그인 컴포넌트 불러오기 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        rosegold: {
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c',
+                            800: '#6c4a4a', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 부드러운 스크롤바 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #e58e8e; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97777; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- 🌟 1. 공통 사이드바 컴포넌트 -->
+    <admin-sidebar active="members"></admin-sidebar>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden w-full">
+        
+        <!-- 🌟 2. 공통 헤더 컴포넌트 -->
+        <admin-header title="이웃(회원) 관리"></admin-header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <select class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 상태</option>
+                        <option value="active">정상 회원</option>
+                        <option value="suspended">정지 회원</option>
+                    </select>
+                    
+                    <select class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 기간</option>
+                        <option value="today">오늘 가입</option>
+                        <option value="week">최근 1주일</option>
+                    </select>
+
+                    <div class="relative w-full sm:w-auto mt-2 sm:mt-0">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="이름, 닉네임 검색" class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-rosegold-300 shadow-sm w-full sm:w-64 md:w-80 transition-all">
+                    </div>
+                </div>
+
+                <button class="w-full lg:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 hover:text-gray-800 transition flex items-center justify-center gap-2 shadow-sm mt-2 lg:mt-0">
+                    <i data-lucide="download" class="w-4 h-4"></i>회원목록 엑셀 다운로드
+                </button>
+            </div>
+
+            <!-- 회원 목록 테이블 영역 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100">
+                                <th class="px-6 py-4 font-medium w-12 text-center">
+                                    <input type="checkbox" id="check-all" onchange="toggleAll(this)" class="rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500 cursor-pointer">
+                                </th>
+                                <th class="px-6 py-4 font-medium">이름(닉네임)</th>
+                                <th class="px-6 py-4 font-medium">연락처</th>
+                                <th class="px-6 py-4 font-medium">참여 동아리</th>
+                                <th class="px-6 py-4 font-medium">가입일</th>
+                                <th class="px-6 py-4 font-medium text-center">상태</th>
+                                <th class="px-6 py-4 font-medium text-center">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="member-list-body" class="text-sm text-gray-700">
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-gray-500 font-medium">
+                                    데이터를 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">전체 <span id="stat-total-bottom" class="font-bold text-gray-800">0</span>명 중 1-10</p>
+                    <div class="flex items-center gap-1">
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-rosegold-500 text-white font-bold transition">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">3</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button onclick="suspendSelected()" class="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 transition shadow-sm whitespace-nowrap">선택 회원 정지</button>
+                <button onclick="deleteSelected()" class="w-full sm:w-auto px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-bold rounded-lg hover:bg-red-50 transition shadow-sm whitespace-nowrap mt-2 sm:mt-0">선택 회원 삭제</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- 🌟 3. 공통 로그인 모달 컴포넌트 -->
+    <admin-login-modal></admin-login-modal>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <script type="module">
+        import { db, auth, appId } from '../firebase-config.js';
+        import { collectionGroup, onSnapshot, collection, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        window.openLoginModal = () => document.getElementById('modal-login').classList.remove('hidden');
+        window.closeLoginModal = () => document.getElementById('modal-login').classList.add('hidden');
+
+        window.logoutAdmin = () => {
+            if(confirm("관리자 계정에서 로그아웃 하시겠습니까?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
+
+        window.loginAdmin = () => {
+            const id = document.getElementById('login-id').value;
+            const pw = document.getElementById('login-pw').value;
+            if (id === 'admin') {
+                signInWithEmailAndPassword(auth, 'admin@internal.system', pw).then(() => { 
+                    closeLoginModal(); 
+                }).catch(() => alert('비밀번호가 올바르지 않습니다.'));
+            } else { 
+                alert('ID 확인 (admin)'); 
+            }
+        };
+
+        window.toggleAll = (source) => {
+            const checkboxes = document.querySelectorAll('.member-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        };
+
+        const getSelectedIds = () => {
+            const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        };
+
+        window.suspendSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("정지할 회원을 먼저 선택해주세요.");
+            if (!confirm(`선택한 ${ids.length}명의 회원을 정말 '정지' 처리하시겠습니까?`)) return;
+
+            try {
+                for (const uid of ids) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'info'), { status: 'suspended' });
+                }
+                alert("✅ 정지 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다. 관리자 권한을 확인해주세요.");
+            }
+        };
+
+        window.deleteSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("삭제할 회원을 먼저 선택해주세요.");
+            if (!confirm(`경고: 선택한 ${ids.length}명의 회원 정보를 완전히 삭제합니다.\n이 작업은 되돌릴 수 없습니다. 진행할까요?`)) return;
+
+            try {
+                for (const uid of ids) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'info'));
+                }
+                alert("🗑️ 삭제 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다. 관리자 권한을 확인해주세요.");
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const btn = document.getElementById('btn-login');
+            const prof = document.getElementById('user-profile');
+            const tbody = document.getElementById('member-list-body');
+
+            if (user && user.email === 'admin@internal.system') {
+                if(btn) btn.classList.add('hidden'); 
+                if(prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
+                startListening();
+            } else {
+                if(btn) btn.classList.remove('hidden'); 
+                if(prof) prof.classList.add('hidden');
+                
+                if(tbody) tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-20 text-center text-gray-400 font-medium italic">관리자 로그인이 필요합니다. 상단의 로그인 버튼을 눌러주세요.</td></tr>';
+                openLoginModal();
+            }
+        });
+
+        const startListening = () => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'market'), (snap) => {
+                let count = 0; snap.forEach(d => { if(d.data().status === 'pending') count++; });
+                const b = document.getElementById('badge-pending-posts');
+                if(b) { if(count > 0) { b.innerText = count+'건'; b.classList.remove('hidden'); } else b.classList.add('hidden'); }
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'reports'), (snap) => {
+                let count = 0; snap.forEach(d => { if(d.data().status === 'pending') count++; });
+                const b = document.getElementById('badge-pending-reports');
+                if(b) { if(count > 0) { b.innerText = count+'건'; b.classList.remove('hidden'); } else b.classList.add('hidden'); }
+            });
+
+            const membersRef = collectionGroup(db, 'profile');
+            onSnapshot(membersRef, (snapshot) => {
+                const members = [];
+                snapshot.forEach(docSnap => { 
+                    const pathSegments = docSnap.ref.path.split('/');
+                    const userId = pathSegments[pathSegments.length - 3];
+                    members.push({ id: userId, ...docSnap.data() }); 
+                });
+
+                members.sort((a, b) => {
+                    const tA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
+                    const tB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
+                    return tB - tA;
+                });
+
+                const statBottom = document.getElementById('stat-total-bottom');
+                if(statBottom) statBottom.innerText = members.length.toLocaleString();
+
+                const tbody = document.getElementById('member-list-body');
+                if (!tbody) return;
+
+                if (members.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-gray-500 font-medium">현재 가입한 회원이 없습니다.</td></tr>`;
+                } else {
+                    const colorMap = [
+                        { bg: 'bg-blue-100', text: 'text-blue-600' }, { bg: 'bg-purple-100', text: 'text-purple-600' },
+                        { bg: 'bg-emerald-100', text: 'text-emerald-600' }, { bg: 'bg-yellow-100', text: 'text-yellow-600' },
+                        { bg: 'bg-gray-200', text: 'text-gray-600' }
+                    ];
+
+                    tbody.innerHTML = members.map(member => {
+                        const initial = member.name ? member.name.charAt(0) : '?';
+                        const colorClass = colorMap[initial.charCodeAt(0) % colorMap.length] || colorMap[0];
+                        
+                        let dateStr = '-';
+                        if (member.createdAt && typeof member.createdAt.toDate === 'function') {
+                            const d = member.createdAt.toDate();
+                            dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+                        }
+
+                        let statusBadge = '<span class="px-2 md:px-2.5 py-0.5 md:py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap">정상</span>';
+                        if (member.status === 'suspended') statusBadge = '<span class="px-2 md:px-2.5 py-0.5 md:py-1 bg-red-100 text-red-700 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap">정지</span>';
+                        else if (member.status === 'withdrawn') statusBadge = '<span class="px-2 md:px-2.5 py-0.5 md:py-1 bg-gray-100 text-gray-600 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap">탈퇴</span>';
+
+                        return `
+                            <tr class="border-b border-gray-50 hover:bg-rosegold-50/30 transition">
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">
+                                    <input type="checkbox" value="${member.id}" class="member-checkbox rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500 cursor-pointer">
+                                </td>
+                                <td class="px-4 md:px-6 py-3 md:py-4">
+                                    <div class="flex items-center gap-2 md:gap-3">
+                                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full ${colorClass.bg} flex items-center justify-center text-xs md:text-sm font-bold ${colorClass.text} flex-shrink-0">${initial}</div>
+                                        <div>
+                                            <p class="font-bold text-gray-800 text-sm md:text-base truncate max-w-[100px] sm:max-w-[150px] md:max-w-none">${member.name || '이름없음'} <span class="font-normal text-gray-500 text-[10px] md:text-xs ml-1">(${member.nickname || '별명없음'})</span></p>
+                                            <p class="text-[10px] md:text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[150px] md:max-w-none">${member.email || '-'}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 text-xs md:text-sm whitespace-nowrap">${member.phone || '-'}</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 text-xs md:text-sm whitespace-nowrap">-</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-gray-500 text-[10px] md:text-xs whitespace-nowrap">${dateStr}</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">${statusBadge}</td>
+                                <td class="px-4 md:px-6 py-3 md:py-4 text-center">
+                                    <button class="text-gray-400 hover:text-rosegold-600 transition" title="상세보기/수정"><i data-lucide="edit" class="w-4 h-4 md:w-5 md:h-5 mx-auto"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                    lucide.createIcons();
+                }
+            }, (error) => console.error("회원 데이터 가져오기 실패 (인덱스 에러 가능성):", error));
+        };
+    </script>
+</body>
+</html>
