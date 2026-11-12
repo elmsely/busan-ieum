@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 함께하는 부산이음 story</title>
+    <!-- Tailwind CSS (디자인 도구) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (아이콘 도구) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Noto Sans KR 웹 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 우리 공통 메뉴와 모달 컴포넌트 불러오기 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] },
+                    colors: { 
+                        rosegold: { 
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c', 800: '#6c4a4a' 
+                        } 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #FAFAFA; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
+
+    <!-- 상단 공통 네비게이션 ('부산이음' 메뉴 활성화) -->
+    <public-nav active="busan-ieum"></public-nav>
+
+    <!-- [화면 1] 메인 홈 및 이야기 피드 목록 화면 -->
+    <main id="view-list" class="flex-1 pt-16 sm:pt-20 animate-[fadeIn_0.4s_ease-out]">
+        
+        <!-- 상단 헤더 배너 -->
+        <section class="bg-gradient-to-r from-[#FAD0B9] via-[#FFC4D9] to-[#FCA8D0] pt-12 pb-24 sm:pt-16 sm:pb-28 px-4 sm:px-6 relative overflow-hidden text-center">
+            <div class="max-w-7xl mx-auto relative z-10">
+                <span class="inline-block px-3 py-1 bg-white/70 backdrop-blur-sm rounded-full text-xs font-bold text-gray-800 mb-3 shadow-sm">마음을 잇는 따뜻한 소통</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3 tracking-tight">함께하는 부산이음 story</h2>
+                <p class="text-sm sm:text-base text-gray-800 font-medium break-keep">기장군 이웃들과 함께 소소한 일상을 기록하고, 우리들의 소중한 활동 발자취를 나누는 열린 게시판입니다.</p>
+            </div>
+        </section>
+
+        <!-- 콘텐츠 영역 -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-14 relative z-20 mb-16 sm:mb-20">
+            <div class="bg-white p-6 sm:p-8 md:p-10 rounded-[2rem] shadow-sm border border-gray-100 mb-10">
+                
+                <!-- 상단 바로가기 3대 카드 (동아리, 우리기장 연결) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10 pb-8 border-b border-gray-100">
+                    <!-- 1. 함께하는 부산이음 story (현재 위치 / 클릭 시 글쓰기 창 오픈 연결) -->
+                    <div onclick="window.scrollToStories()" class="cursor-pointer p-6 rounded-2xl bg-rosegold-50/70 border-2 border-rosegold-200 flex flex-col items-center text-center shadow-sm hover:border-rosegold-300 transition-all">
+                        <div class="w-12 h-12 rounded-full bg-rosegold-100 text-rosegold-600 flex items-center justify-center mb-3">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-black text-base text-gray-900 mb-1">함께하는 부산이음 story</h4>
+                        <p class="text-xs text-gray-600 leading-relaxed">이웃들과 함께 나눈 따뜻한 이야기들을 기록해요.</p>
+                        <span class="mt-3 text-[11px] font-black text-rosegold-600 bg-white px-3 py-1 rounded-full border border-rosegold-200">이야기 모음 공간 ✍️</span>
+                    </div>
+
+                    <!-- 2. 함께하는동아리 -->
+                    <a href="club.html" class="group p-6 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col items-center text-center hover:bg-white hover:border-blue-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-base text-gray-900 mb-1 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                            함께하는동아리
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">취향 맞는 이웃들과 모여 취미와 활동을 즐겨보세요!</p>
+                        <span class="mt-3 text-[11px] font-bold text-blue-500 bg-blue-50 px-2.5 py-1 rounded-full group-hover:bg-blue-500 group-hover:text-white transition-colors">동아리 보러가기 →</span>
+                    </a>
+
+                    <!-- 3. 우리기장 -->
+                    <a href="market.html" class="group p-6 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col items-center text-center hover:bg-white hover:border-amber-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i data-lucide="store" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-base text-gray-900 mb-1 group-hover:text-amber-600 transition-colors flex items-center gap-1">
+                            우리기장
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">이웃들이 직접 추천하는 기장의 맛집, 카페, 나들이 소식이에요.</p>
+                        <span class="mt-3 text-[11px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full group-hover:bg-amber-500 group-hover:text-white transition-colors">소식 보러가기 →</span>
+                    </a>
+                </div>
+
+                <!-- 타이틀 바 & 새 이야기 쓰기 버튼 -->
+                <div id="stories-section" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-2">
+                            <i data-lucide="book-open" class="w-6 h-6 text-rosegold-500"></i>
+                            이웃들의 활동 이야기 게시판
+                        </h3>
+                        <p class="text-xs text-gray-400 font-medium mt-1">카드를 클릭하면 사진과 본문을 큰 화면으로 자세히 볼 수 있습니다.</p>
+                    </div>
+                    <button onclick="window.openWriteModal()" class="inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-gray-900 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-800 transition shadow-md active:scale-95 whitespace-nowrap">
+                        <i data-lucide="pen-tool" class="w-4 h-4"></i> + 새 이야기 작성하기
+                    </button>
+                </div>
+
+                <!-- 실시간 게시글 그리드 목록 (Firestore 연동) -->
+                <div id="story-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full py-16 text-center text-gray-400 font-medium text-sm">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rosegold-500 mx-auto mb-3"></div>
+                        이야기를 불러오고 있습니다...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- [화면 2] Trace 2030 스타일 활동 상세 열람 페이지 (두 번째 사진 완벽 구현) -->
+    <main id="view-detail" class="hidden flex-1 pt-24 sm:pt-28 pb-20 max-w-4xl mx-auto w-full px-4 sm:px-6 animate-[fadeIn_0.3s_ease-out]">
+        
+        <!-- 상단 헤더 & 뒤로가기 -->
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-200">
+            <button onclick="window.switchToList()" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> ← 이야기 목록으로 돌아가기
+            </button>
+            <span class="px-3 py-1 bg-rosegold-50 text-rosegold-600 rounded-full text-xs font-black border border-rosegold-100">
+                부산이음 Story
+            </span>
+        </div>
+
+        <!-- 활동 제목 -->
+        <h1 id="detail-title" class="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight mb-6 leading-tight break-keep">
+            활동 제목
+        </h1>
+
+        <!-- 상단 요약 정보 박스 (일자, 장소, 작성자) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200/80 shadow-sm text-xs mb-8">
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">활동 일자</span>
+                <span id="detail-date" class="font-bold text-gray-900 text-xs sm:text-sm block">-</span>
+            </div>
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">활동 장소</span>
+                <span id="detail-place" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">작성자</span>
+                <span id="detail-author" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+        </div>
+
+        <!-- 메인 사진 갤러리 섹션 (큰 대표 이미지 + 썸네일) -->
+        <div id="detail-gallery-section" class="bg-white rounded-3xl p-5 sm:p-8 border border-gray-200/80 shadow-sm space-y-4 mb-8">
+            <div class="w-full aspect-[16/10] sm:aspect-[16/9] bg-gray-100 rounded-2xl overflow-hidden relative border border-gray-100 shadow-inner">
+                <img id="detail-main-img" src="" alt="대표 사진" class="w-full h-full object-cover transition-opacity duration-300">
+            </div>
+            <div id="detail-thumb-row" class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3 pt-1"></div>
+        </div>
+
+        <!-- 본문 상세 스토리 영역 -->
+        <div class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-sm mb-8 space-y-6">
+            <div class="border-l-4 border-rosegold-500 pl-4 py-1">
+                <h3 class="text-base sm:text-lg font-black text-gray-900">활동 스토리</h3>
+            </div>
+            <div class="p-6 bg-gray-50/70 rounded-2xl border border-gray-100">
+                <p id="detail-content" class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium whitespace-pre-line break-keep">
+                    본문 내용이 표시됩니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 하단 목록으로 돌아가기 버튼 -->
+        <div class="pt-4 border-t border-gray-200 flex justify-between items-center">
+            <button onclick="window.switchToList()" class="px-6 py-3.5 bg-gray-900 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-800 transition shadow-sm">
+                ← 목록으로 돌아가기
+            </button>
+        </div>
+    </main>
+
+    <!-- [모달] 사용자 전용 간편 글쓰기 & 사진 업로드 창 -->
+    <div id="modal-write" class="fixed inset-0 bg-black/60 z-[150] hidden flex items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="bg-white w-full max-w-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar animate-[fadeIn_0.3s_ease-out]">
+            <button onclick="window.closeWriteModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-5 mt-1 flex items-center gap-2">
+                <i data-lucide="pen-tool" class="text-rosegold-500 w-5 h-5"></i> 부산이음 이야기 쓰기
+            </h3>
+
+            <div class="space-y-4">
+                <!-- 사진 업로드 (스마트 자동 압축 기능 내장) -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">현장 사진 첨부</label>
+                    <p class="text-[11px] text-rosegold-500 font-bold mb-2">※ 스마트폰 고화질 사진도 크기가 자동으로 조절되어 안전하게 올라가요!</p>
+                    <button type="button" onclick="document.getElementById('story-photo-input').click()" class="w-full h-44 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-gray-400 transition group overflow-hidden relative shadow-inner">
+                        <i data-lucide="camera" class="w-8 h-8 mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-xs sm:text-sm">클릭하여 사진 선택</span>
+                        <img id="story-photo-preview" class="absolute inset-0 w-full h-full object-cover hidden" alt="미리보기">
+                    </button>
+                    <input type="file" id="story-photo-input" class="hidden" accept="image/*">
+                </div>
+
+                <!-- 제목 -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">활동 제목</label>
+                    <input type="text" id="story-title" placeholder="예: 임랑해수욕장 플로깅 — 바람은 불었지만" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm">
+                </div>
+
+                <!-- 장소 & 일자 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">활동 장소</label>
+                        <input type="text" id="story-place" placeholder="예: 임랑해수욕장 일대" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">활동 일자</label>
+                        <input type="date" id="story-date" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm text-gray-700">
+                    </div>
+                </div>
+
+                <!-- 내용 -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">상세 이야기</label>
+                    <textarea id="story-content" rows="6" placeholder="활동하며 느꼈던 소감과 이웃들과 함께한 따뜻한 이야기들을 편하게 적어주세요." class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none resize-none text-sm leading-relaxed"></textarea>
+                </div>
+
+                <button type="button" onclick="window.submitStory()" class="w-full bg-gray-900 text-white font-black text-base sm:text-lg py-4 rounded-2xl hover:bg-gray-800 transition shadow-md active:scale-95 mt-2">
+                    게시글 등록하기 ✨
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공통 푸터 & 모달 -->
+    <public-footer></public-footer>
+    <public-modals></public-modals>
+
+    <!-- 파이어베이스 스크립트 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAoiX0R0hJoWYqyy52Y6sFWIxwPoljR_7k", 
+            authDomain: "talent.unifactory.kr", 
+            projectId: "talent-af055", 
+            storageBucket: "talent-af055.firebasestorage.app", 
+            messagingSenderId: "476130735120", 
+            appId: "1:476130735120:web:aae71ccf3e626152e40695", 
+            measurementId: "G-1XSNXNNGMH" 
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'talent-af055';
+
+        let currentUploadedImage = null;
+        let storyCache = {};
+
+        lucide.createIcons();
+
+        // 🌟 스크롤 이동 헬퍼
+        window.scrollToStories = () => {
+            const el = document.getElementById('stories-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // 🌟 모달 창 제어
+        window.openWriteModal = () => {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) {
+                alert("이야기를 남기시려면 먼저 로그인해 주세요! 😊");
+                if (window.openLoginModal) window.openLoginModal();
+                return;
+            }
+            document.getElementById('modal-write').classList.remove('hidden');
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('story-date');
+            if (dateInput && !dateInput.value) dateInput.value = today;
+        };
+
+        window.closeWriteModal = () => {
+            document.getElementById('modal-write').classList.add('hidden');
+            currentUploadedImage = null;
+            const preview = document.getElementById('story-photo-preview');
+            if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+            document.getElementById('story-photo-input').value = '';
+        };
+
+        // 🌟 스마트 사진 리사이징 압축 (용량 문제 없이 업로드 가능하도록 800px로 자동 최적화)
+        document.getElementById('story-photo-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    currentUploadedImage = canvas.toDataURL('image/jpeg', 0.82);
+                    const preview = document.getElementById('story-photo-preview');
+                    preview.src = currentUploadedImage;
+                    preview.classList.remove('hidden');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 🌟 게시글 등록 실행
+        window.submitStory = async () => {
+            const user = auth.currentUser;
+            if (!user || user.isAnonymous) return alert("로그인이 필요합니다.");
+
+            const title = document.getElementById('story-title').value.trim();
+            const place = document.getElementById('story-place').value.trim();
+            const dateVal = document.getElementById('story-date').value;
+            const content = document.getElementById('story-content').value.trim();
+
+            if (!title || !content) return alert("제목과 상세 이야기를 모두 입력해 주세요!");
+
+            try {
+                let authorName = user.displayName || '이웃';
+                try {
+                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                    if (profileDoc.exists()) {
+                        authorName = profileDoc.data().nickname || profileDoc.data().name || authorName;
+                    }
+                } catch(e) {}
+
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'stories'), {
+                    title,
+                    place: place || '기장군 일대',
+                    activityDate: dateVal || new Date().toISOString().split('T')[0],
+                    content,
+                    imageUrl: currentUploadedImage || '',
+                    authorName,
+                    authorId: user.uid,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("🎉 소중한 이야기가 성공적으로 등록되었습니다!");
+                window.closeWriteModal();
+                document.getElementById('story-title').value = '';
+                document.getElementById('story-place').value = '';
+                document.getElementById('story-content').value = '';
+            } catch (err) {
+                console.error(err);
+                alert("등록 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+            }
+        };
+
+        // 🌟 실시간 이야기 목록 수신 및 카드 생성
+        const storiesRef = collection(db, 'artifacts', appId, 'public', 'data', 'stories');
+        onSnapshot(storiesRef, (snapshot) => {
+            const container = document.getElementById('story-list-container');
+            storyCache = {};
+
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-gray-400 font-medium text-sm bg-gray-50 rounded-2xl border border-gray-100">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-rosegold-400 mx-auto mb-2"></i>
+                        아직 등록된 부산이음 이야기가 없습니다.<br>
+                        상단의 '+ 새 이야기 작성하기' 버튼을 눌러 첫 번째 이야기를 남겨보세요! ✨
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const stories = [];
+            snapshot.forEach(docSnap => {
+                const data = { id: docSnap.id, ...docSnap.data() };
+                storyCache[docSnap.id] = data;
+                stories.push(data);
+            });
+
+            // 최신 날짜 순 정렬
+            stories.sort((a, b) => {
+                const tA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                const tB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                return tB - tA;
+            });
+
+            const fallback = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800';
+
+            container.innerHTML = stories.map(item => {
+                const imgSrc = (item.imageUrl && item.imageUrl.length > 10) ? item.imageUrl : fallback;
+                return `
+                <div onclick="window.openStoryDetail('${item.id}')" class="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-rosegold-300 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full">
+                    <div class="w-full aspect-[16/10] bg-gray-100 overflow-hidden relative flex-shrink-0">
+                        <img src="${imgSrc}" onerror="this.onerror=null; this.src='${fallback}';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-bold text-gray-800 shadow-sm flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3 h-3 text-rosegold-500"></i> ${item.place || '기장'}
+                        </div>
+                    </div>
+                    <div class="p-5 flex flex-col flex-1">
+                        <span class="text-[11px] font-bold text-rosegold-500 mb-1 block">${item.activityDate || '최근 활동'}</span>
+                        <h4 class="font-black text-base sm:text-lg text-gray-900 group-hover:text-rosegold-600 transition truncate mb-2">
+                            ${item.title}
+                        </h4>
+                        <p class="text-xs text-gray-500 font-medium line-clamp-2 leading-relaxed mb-4 flex-1">
+                            ${item.content}
+                        </p>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto text-xs font-bold text-gray-400">
+                            <span class="text-gray-600">${item.authorName || '이웃'} 님</span>
+                            <span class="text-rosegold-500 font-extrabold group-hover:translate-x-0.5 transition-transform">스토리 읽기 →</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        });
+
+        // 🌟 Trace 2030 스타일 상세 페이지 열람 (두 번째 캡처 완벽 재현)
+        window.openStoryDetail = (id) => {
+            const item = storyCache[id];
+            if (!item) return;
+
+            document.getElementById('detail-title').textContent = item.title;
+            document.getElementById('detail-date').textContent = item.activityDate || '최근 일자';
+            document.getElementById('detail-place').textContent = item.place || '기장군 일대';
+            document.getElementById('detail-author').textContent = (item.authorName || '이웃') + ' 님';
+            document.getElementById('detail-content').textContent = item.content;
+
+            const fallback = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800';
+            const mainImg = document.getElementById('detail-main-img');
+            const thumbRow = document.getElementById('detail-thumb-row');
+
+            const imgSrc = (item.imageUrl && item.imageUrl.length > 10) ? item.imageUrl : fallback;
+            mainImg.src = imgSrc;
+
+            thumbRow.innerHTML = `
+                <button type="button" class="aspect-square rounded-xl overflow-hidden border-2 border-rosegold-500 bg-gray-100 shadow-sm">
+                    <img src="${imgSrc}" class="w-full h-full object-cover">
+                </button>
+            `;
+
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-detail').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            lucide.createIcons();
+        };
+
+        // 🌟 목록으로 돌아가기
+        window.switchToList = () => {
+            document.getElementById('view-detail').classList.add('hidden');
+            document.getElementById('view-list').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        };
+    </script>
+</body>
+</html>

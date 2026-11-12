@@ -1,0 +1,8 @@
+1. 코드 복사 붙이기 이후 적용하는 방법
+
+firebase deploy
+
+2. 실수 했을 때 되돌릴 방법
+
+busan-ieum back
+

@@ -1,0 +1,912 @@
+<!-- public/activity.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 동아리 상세 안내</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Noto Sans KR Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] },
+                    colors: {
+                        rosegold: {
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c', 800: '#6c4a4a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #FAFAFA; color: #1f2937; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative">
+
+    <public-nav active="club"></public-nav>
+
+    <!-- [뷰 1] 동아리 상세 소개 화면 -->
+    <main id="view-detail" class="flex-1 pt-24 sm:pt-28 pb-20 max-w-4xl mx-auto w-full px-4 sm:px-6 animate-[fadeIn_0.3s_ease-out]">
+        
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-200">
+            <a href="club.html" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> 동아리 목록으로 돌아가기
+            </a>
+            
+            <div id="club-leader-actions" class="hidden items-center gap-2">
+                <button onclick="openEditClubModal()" class="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-50 transition flex items-center gap-1 shadow-sm">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5 text-blue-500"></i> 동아리 수정
+                </button>
+                <button onclick="deleteClubAction()" class="px-3 py-1.5 bg-red-50 border border-red-200 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition flex items-center gap-1 shadow-sm">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 동아리 삭제
+                </button>
+            </div>
+        </div>
+
+        <h1 id="detail-club-title" class="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight mb-6 leading-tight">
+            동아리 정보를 불러오는 중입니다...
+        </h1>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200/80 shadow-sm text-xs mb-8">
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">활동 장소</span>
+                <span id="detail-club-place" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">동아리 이끔이</span>
+                <span id="detail-club-leader" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">개설 분류</span>
+                <span id="detail-club-cat-name" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 sm:p-8 border border-gray-200/80 shadow-sm space-y-4 mb-8">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm sm:text-base font-black text-gray-900 flex items-center gap-1.5">
+                    <i data-lucide="camera" class="w-4 h-4 text-rosegold-500"></i> 대표 사진 갤러리
+                </h3>
+                <span class="text-[11px] text-gray-400 font-medium">사진을 누르면 크게 볼 수 있습니다</span>
+            </div>
+
+            <div class="w-full aspect-[16/10] sm:aspect-[16/9] bg-gray-100 rounded-2xl overflow-hidden relative border border-gray-100 shadow-inner">
+                <img id="detail-main-img" src="" alt="대표 사진" class="w-full h-full object-cover transition-opacity duration-300">
+            </div>
+
+            <div id="detail-thumb-row" class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3 pt-1"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-sm space-y-4 mb-8">
+            <h3 class="text-base sm:text-lg font-black text-gray-900 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-rosegold-500"></i> 모임 소개 및 참여 안내
+            </h3>
+            <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                <p id="detail-club-desc" class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium whitespace-pre-line break-keep">
+                    상세 안내 내용을 불러오고 있습니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 하단 액션바: 운영자/관리자일 경우 [수정] 버튼과 [전용 게시판 입장하기] 노출 -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <button id="btn-apply-club" type="button" class="w-full sm:flex-1 py-4 bg-gray-900 text-white rounded-xl font-black text-base hover:bg-gray-800 transition shadow-md active:scale-95">
+                가입 신청하기
+            </button>
+            
+            <button id="btn-bottom-edit" type="button" onclick="openEditClubModal()" class="w-full sm:w-auto px-6 py-4 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl font-black text-base hover:bg-blue-100 transition whitespace-nowrap hidden active:scale-95 flex items-center justify-center gap-1.5 shadow-sm">
+                <i data-lucide="edit-3" class="w-4 h-4"></i> 수정
+            </button>
+
+            <button id="btn-board-club" type="button" class="w-full sm:w-auto px-8 py-4 bg-rosegold-50 text-rosegold-600 border border-rosegold-200 rounded-xl font-bold text-base hover:bg-rosegold-100 transition whitespace-nowrap hidden">
+                전용 게시판 입장하기 →
+            </button>
+        </div>
+    </main>
+
+    <!-- [뷰 2] 전용 게시판 목록 화면 -->
+    <main id="view-board" class="hidden flex-1 pt-24 sm:pt-28 pb-20 max-w-4xl mx-auto w-full px-4 sm:px-6 animate-[fadeIn_0.3s_ease-out]">
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-200">
+            <button onclick="switchToDetail()" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> 상세 안내로 돌아가기
+            </button>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">정식 멤버 활동 중</span>
+        </div>
+
+        <div class="bg-gray-900 text-white rounded-3xl p-6 sm:p-8 mb-8 shadow-md relative overflow-hidden">
+            <h2 id="board-title" class="text-xl sm:text-2xl font-black mb-2">동아리 전용 게시판</h2>
+            <p class="text-xs sm:text-sm text-gray-300">멤버들과 함께 나눈 활동 사진과 소식들을 자유롭게 공유해 보세요.</p>
+            <button onclick="openWritePostModal()" class="mt-4 px-4 py-2 bg-white text-gray-900 rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-100 transition inline-flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i> 활동 소식 올리기
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-lg font-black text-gray-900 flex items-center justify-between">
+                <span>우리들의 활동 기록</span>
+                <span class="text-xs text-gray-400 font-normal">카드를 클릭하면 상세한 내용을 확인할 수 있습니다</span>
+            </h3>
+            <div id="board-posts-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div class="col-span-full py-12 text-center text-gray-400 font-medium text-sm">게시글을 불러오는 중입니다...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- [뷰 3] 단독 게시글 상세 열람 화면 -->
+    <main id="view-post-detail" class="hidden flex-1 pt-24 sm:pt-28 pb-20 max-w-4xl mx-auto w-full px-4 sm:px-6 animate-[fadeIn_0.3s_ease-out]">
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-200">
+            <button onclick="switchToBoard()" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> 게시판 목록으로 돌아가기
+            </button>
+            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                활동 기록
+            </span>
+        </div>
+
+        <h1 id="post-view-title" class="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight mb-6 leading-tight break-keep">
+            활동 제목
+        </h1>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200/80 shadow-sm text-xs mb-8">
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">작성 일자</span>
+                <span id="post-view-date" class="font-bold text-gray-900 text-xs sm:text-sm block">-</span>
+            </div>
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">소속 동아리</span>
+                <span id="post-view-club-name" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+            <div>
+                <span class="block text-gray-400 font-bold mb-0.5">작성자</span>
+                <span id="post-view-author" class="font-bold text-gray-900 text-xs sm:text-sm truncate block">-</span>
+            </div>
+        </div>
+
+        <div id="post-gallery-section" class="bg-white rounded-3xl p-5 sm:p-8 border border-gray-200/80 shadow-sm space-y-4 mb-8">
+            <div class="w-full aspect-[16/10] sm:aspect-[16/9] bg-gray-100 rounded-2xl overflow-hidden relative border border-gray-100 shadow-inner">
+                <img id="post-view-main-img" src="" alt="현장 사진" class="w-full h-full object-cover transition-opacity duration-300">
+            </div>
+            <div id="post-view-thumb-row" class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3 pt-1"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-sm mb-8 space-y-6">
+            <div class="border-l-4 border-rosegold-500 pl-4 py-1">
+                <h3 class="text-base sm:text-lg font-black text-gray-900">활동 스토리</h3>
+            </div>
+            <div class="p-6 bg-gray-50/70 rounded-2xl border border-gray-100">
+                <p id="post-view-content" class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium whitespace-pre-line break-keep">
+                    본문 내용
+                </p>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <button onclick="switchToBoard()" class="w-full sm:w-auto px-6 py-3.5 bg-gray-900 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-800 transition">
+                ← 목록으로 돌아가기
+            </button>
+            <div id="post-owner-actions" class="w-full sm:w-auto flex items-center justify-end gap-2">
+                <button type="button" onclick="openEditPostModal()" class="flex-1 sm:flex-none px-5 py-3.5 bg-white border border-gray-300 text-gray-700 rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-50 transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <i data-lucide="edit-3" class="w-4 h-4 text-blue-500"></i> 소식 수정
+                </button>
+                <button id="btn-delete-post" onclick="deleteCurrentPost()" class="flex-1 sm:flex-none px-5 py-3.5 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs sm:text-sm font-bold hover:bg-red-100 transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> 소식 삭제
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- [동아리 정보 수정 모달] -->
+    <div id="modal-edit-club" class="fixed inset-0 bg-black/60 z-[160] hidden flex items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="bg-white w-full max-w-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar animate-[fadeIn_0.3s_ease-out]">
+            <button onclick="closeEditClubModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-5 mt-1 flex items-center gap-2">
+                <i data-lucide="edit-3" class="text-blue-500 w-5 h-5"></i> 동아리 정보 수정
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">대표 사진 변경 (선택사항)</label>
+                    <p class="text-[11px] text-gray-400 font-medium mb-2">※ 사진을 바꿀 때만 클릭해 주세요. 그대로 두면 기존 사진이 유지됩니다.</p>
+                    <button type="button" onclick="document.getElementById('edit-club-photo-input').click()" class="w-full h-40 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 transition group overflow-hidden relative shadow-inner">
+                        <i data-lucide="camera" class="w-8 h-8 mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-xs sm:text-sm">사진 바꾸기</span>
+                        <img id="edit-club-photo-preview" class="absolute inset-0 w-full h-full object-cover hidden" alt="미리보기">
+                    </button>
+                    <input type="file" id="edit-club-photo-input" class="hidden" accept="image/*">
+                </div>
+
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">동아리 분류</label>
+                    <select id="edit-club-category" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm">
+                        <option value="son">✂️ 손수 (공예, 손재주, 요리 등)</option>
+                        <option value="mom">🏃 몸소 (운동, 건강, 나들이 등)</option>
+                        <option value="etc">🌻 그 외 (취미, 학습, 나눔 등)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">동아리 명칭</label>
+                    <input type="text" id="edit-club-title" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-bold text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">활동 장소</label>
+                    <input type="text" id="edit-club-place" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none font-medium text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5">소개글 및 활동 안내</label>
+                    <textarea id="edit-club-desc" rows="4" class="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none resize-none text-sm leading-relaxed"></textarea>
+                </div>
+                <button type="button" onclick="submitEditClub()" class="w-full bg-blue-600 text-white font-black text-base sm:text-lg py-4 rounded-2xl hover:bg-blue-700 transition shadow-md active:scale-95 mt-2">
+                    수정 내용 저장하기 💾
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [게시판 소식 수정 모달] -->
+    <div id="modal-edit-post" class="fixed inset-0 bg-black/60 z-[160] hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white w-full max-w-md rounded-[2rem] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <button onclick="closeEditPostModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-900 p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
+                <i data-lucide="edit-3" class="w-5 h-5 text-blue-500"></i> 활동 소식 수정
+            </h3>
+            <div class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">사진 변경 (선택사항)</label>
+                    <input type="file" id="edit-post-file-input" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:font-bold">
+                    <img id="edit-post-file-preview" class="w-full h-32 object-cover rounded-xl mt-2 hidden border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">제목</label>
+                    <input type="text" id="edit-post-title-input" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">내용</label>
+                    <textarea id="edit-post-content-input" rows="5" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none resize-none leading-relaxed"></textarea>
+                </div>
+                <button type="button" onclick="submitEditPostAction()" class="w-full py-3.5 bg-blue-600 text-white rounded-xl font-black text-sm hover:bg-blue-700 transition mt-2">
+                    수정 내용 저장 💾
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 가입 신청서 모달 -->
+    <div id="modal-apply-form" class="fixed inset-0 bg-black/60 z-[160] hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white w-full max-w-md rounded-[2rem] p-6 sm:p-8 shadow-2xl relative">
+            <button onclick="closeApplyForm()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-900 p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-xl font-black text-gray-900 mb-2">동아리 가입 신청</h3>
+            <p class="text-xs text-gray-500 mb-4">리더에게 전하고 싶은 한마디나 참여 포부를 적어주세요.</p>
+            <textarea id="apply-message" rows="4" placeholder="예: 안녕하세요! 이번 주말 모임부터 함께 참여하고 싶습니다." class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 outline-none text-sm resize-none mb-4"></textarea>
+            <button type="button" onclick="submitApplication()" class="w-full py-3.5 bg-gray-900 text-white rounded-xl font-black text-sm hover:bg-gray-800 transition">
+                신청서 제출하기
+            </button>
+        </div>
+    </div>
+
+    <!-- 활동 소식 작성 모달 -->
+    <div id="modal-write-post" class="fixed inset-0 bg-black/60 z-[160] hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white w-full max-w-md rounded-[2rem] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <button onclick="closeWritePostModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-900 p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-xl font-black text-gray-900 mb-4">활동 소식 남기기</h3>
+            <div class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">사진 첨부 (대표 1장)</label>
+                    <input type="file" id="post-file-input" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:font-bold">
+                    <img id="post-file-preview" class="w-full h-32 object-cover rounded-xl mt-2 hidden border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">제목</label>
+                    <input type="text" id="post-title-input" placeholder="게시글 제목" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">내용</label>
+                    <textarea id="post-content-input" rows="5" placeholder="활동 현장 내용과 소감을 자유롭게 적어주세요." class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none resize-none leading-relaxed"></textarea>
+                </div>
+                <button type="button" onclick="submitPostAction()" class="w-full py-3.5 bg-gray-900 text-white rounded-xl font-black text-sm hover:bg-gray-800 transition mt-2">
+                    등록 완료
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <public-footer></public-footer>
+    <public-modals></public-modals>
+
+    <script type="module">
+        import { db, auth, appId } from './firebase-config.js';
+        import { onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { doc, getDoc, collection, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const clubId = urlParams.get('id');
+
+        let currentClubData = null;
+        let galleryImages = [];
+        let postCache = {};
+        let currentViewingPostId = null;
+        let uploadedPostImageData = null;
+        let editUploadedPostImageData = null;
+        let currentEditClubPhotoData = null;
+
+        lucide.createIcons();
+
+        if (!clubId) {
+            alert("동아리 정보가 올바르지 않습니다.");
+            location.href = 'club.html';
+        }
+
+        const loadClubDetails = async () => {
+            try {
+                const clubDoc = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId));
+                if (!clubDoc.exists()) {
+                    alert("해당 동아리 정보를 찾을 수 없습니다.");
+                    location.href = 'club.html';
+                    return;
+                }
+
+                currentClubData = { id: clubDoc.id, ...clubDoc.data() };
+                renderClubDetails(currentClubData);
+                checkUserMembership();
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const renderClubDetails = (club) => {
+            const title = club.name || club.title || '동아리 모임';
+            const catMap = { son: '✂️ 손수 (공예/만들기)', mom: '🏃 몸소 (건강/활동)', etc: '🌻 그 외 나눔' };
+            
+            document.getElementById('detail-club-title').textContent = title;
+            document.getElementById('detail-club-place').textContent = club.place || '기장군 일대';
+            document.getElementById('detail-club-leader').textContent = (club.leaderName || club.authorName || '이웃') + ' 님';
+            document.getElementById('detail-club-cat-name').textContent = catMap[club.category] || '동아리 모임';
+            document.getElementById('detail-club-desc').textContent = club.intro || club.description || club.content || '활동 안내 내용이 등록되어 있지 않습니다.';
+
+            const user = auth.currentUser;
+            const leaderActions = document.getElementById('club-leader-actions');
+            const bottomEditBtn = document.getElementById('btn-bottom-edit');
+
+            if (user && !user.isAnonymous && (club.leaderId === user.uid || user.email === 'admin@internal.system')) {
+                if (leaderActions) { leaderActions.classList.remove('hidden'); leaderActions.classList.add('flex'); }
+                if (bottomEditBtn) { bottomEditBtn.classList.remove('hidden'); }
+            } else {
+                if (leaderActions) { leaderActions.classList.add('hidden'); leaderActions.classList.remove('flex'); }
+                if (bottomEditBtn) { bottomEditBtn.classList.add('hidden'); }
+            }
+
+            galleryImages = [];
+            if (club.imageUrl && club.imageUrl.length > 10) galleryImages.push(club.imageUrl);
+            if (Array.isArray(club.gallery)) galleryImages.push(...club.gallery);
+            if (galleryImages.length === 0) {
+                galleryImages = ['https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800'];
+            }
+
+            const mainImg = document.getElementById('detail-main-img');
+            mainImg.src = galleryImages[0];
+
+            const thumbRow = document.getElementById('detail-thumb-row');
+            thumbRow.innerHTML = galleryImages.map((src, idx) => `
+                <button type="button" onclick="selectClubPhoto('${src}')" class="aspect-square rounded-xl overflow-hidden border-2 ${idx === 0 ? 'border-rosegold-500' : 'border-transparent'} hover:opacity-90 transition relative bg-gray-100 shadow-sm thumb-btn">
+                    <img src="${src}" class="w-full h-full object-cover">
+                </button>
+            `).join('');
+
+            lucide.createIcons();
+        };
+
+        window.selectClubPhoto = (src) => {
+            const mainImg = document.getElementById('detail-main-img');
+            mainImg.style.opacity = '0.3';
+            setTimeout(() => {
+                mainImg.src = src;
+                mainImg.style.opacity = '1';
+            }, 120);
+
+            document.querySelectorAll('#detail-thumb-row .thumb-btn').forEach(btn => {
+                const img = btn.querySelector('img');
+                if (img && img.src === src) {
+                    btn.classList.add('border-rosegold-500');
+                    btn.classList.remove('border-transparent');
+                } else {
+                    btn.classList.remove('border-rosegold-500');
+                    btn.classList.add('border-transparent');
+                }
+            });
+        };
+
+        const checkUserMembership = async () => {
+            const user = auth.currentUser;
+            const applyBtn = document.getElementById('btn-apply-club');
+            const boardBtn = document.getElementById('btn-board-club');
+            const bottomEditBtn = document.getElementById('btn-bottom-edit');
+
+            if (!user || user.isAnonymous) {
+                applyBtn.textContent = "로그인 후 가입 신청하기";
+                applyBtn.disabled = false;
+                applyBtn.classList.remove('opacity-70');
+                applyBtn.onclick = () => window.openLoginModal();
+                boardBtn.classList.add('hidden');
+                if (bottomEditBtn) bottomEditBtn.classList.add('hidden');
+                return;
+            }
+
+            if (currentClubData && (currentClubData.leaderId === user.uid || user.email === 'admin@internal.system')) {
+                applyBtn.textContent = "내가 운영 중인 동아리입니다";
+                applyBtn.disabled = true;
+                applyBtn.classList.add('opacity-70');
+                boardBtn.classList.remove('hidden');
+                boardBtn.onclick = () => switchToBoard();
+                if (bottomEditBtn) bottomEditBtn.classList.remove('hidden');
+                return;
+            }
+
+            if (bottomEditBtn) bottomEditBtn.classList.add('hidden');
+
+            try {
+                const mDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'memberships', clubId));
+                
+                if (mDoc.exists() && mDoc.data().status === 'approved') {
+                    applyBtn.textContent = "가입 완료된 정식 멤버입니다";
+                    applyBtn.disabled = true;
+                    applyBtn.classList.add('opacity-70');
+                    boardBtn.classList.remove('hidden');
+                    boardBtn.onclick = () => switchToBoard();
+                } else if (mDoc.exists() && mDoc.data().status === 'pending') {
+                    applyBtn.textContent = "가입 승인 대기 중입니다...";
+                    applyBtn.disabled = true;
+                    applyBtn.classList.add('opacity-70');
+                    boardBtn.classList.add('hidden');
+                } else {
+                    applyBtn.textContent = "가입 신청하기";
+                    applyBtn.disabled = false;
+                    applyBtn.classList.remove('opacity-70');
+                    applyBtn.onclick = () => openApplyForm();
+                    boardBtn.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            const btn = document.getElementById('btn-login');
+            const prof = document.getElementById('user-profile');
+
+            if (user && !user.isAnonymous) {
+                if (btn) btn.classList.add('hidden');
+                if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
+
+                let name = user.displayName;
+                try {
+                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                    if (profileDoc.exists()) {
+                        name = profileDoc.data().nickname || profileDoc.data().name || name;
+                    }
+                } catch (e) {}
+
+                name = name || '이웃';
+                const nameEl = document.getElementById('user-name');
+                const avatarEl = document.getElementById('user-avatar');
+                if (nameEl) nameEl.textContent = name + " 님";
+                if (avatarEl) avatarEl.textContent = name.charAt(0);
+            } else {
+                if (btn) btn.classList.remove('hidden');
+                if (prof) prof.classList.add('hidden');
+                if (!user) {
+                    signInAnonymously(auth).catch(() => {});
+                }
+            }
+
+            if (currentClubData) {
+                checkUserMembership();
+                renderClubDetails(currentClubData);
+            }
+        });
+
+        window.switchToBoard = () => {
+            document.getElementById('view-detail').classList.add('hidden');
+            document.getElementById('view-post-detail').classList.add('hidden');
+            document.getElementById('view-board').classList.remove('hidden');
+            document.getElementById('board-title').textContent = (currentClubData.name || currentClubData.title) + " 전용 게시판";
+            window.scrollTo(0, 0);
+            loadBoardPosts();
+        };
+
+        window.switchToDetail = () => {
+            document.getElementById('view-board').classList.add('hidden');
+            document.getElementById('view-post-detail').classList.add('hidden');
+            document.getElementById('view-detail').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        };
+
+        window.openPostDetail = (postId) => {
+            const post = postCache[postId];
+            if (!post) return;
+
+            currentViewingPostId = postId;
+
+            document.getElementById('post-view-title').textContent = post.title || '제목 없음';
+            document.getElementById('post-view-content').textContent = post.content || '';
+            document.getElementById('post-view-author').textContent = (post.authorName || '이웃') + ' 님';
+            document.getElementById('post-view-club-name').textContent = currentClubData.name || currentClubData.title || '동아리';
+
+            let dateText = '최근 기록';
+            if (post.createdAt && post.createdAt.toDate) {
+                const d = post.createdAt.toDate();
+                dateText = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+            }
+            document.getElementById('post-view-date').textContent = dateText;
+
+            const user = auth.currentUser;
+            const ownerActions = document.getElementById('post-owner-actions');
+            if (ownerActions) {
+                if (user && !user.isAnonymous && (post.authorId === user.uid || currentClubData.leaderId === user.uid || user.email === 'admin@internal.system')) {
+                    ownerActions.classList.remove('hidden');
+                    ownerActions.classList.add('flex');
+                } else {
+                    ownerActions.classList.add('hidden');
+                    ownerActions.classList.remove('flex');
+                }
+            }
+
+            const gallerySec = document.getElementById('post-gallery-section');
+            const mainImg = document.getElementById('post-view-main-img');
+            const thumbRow = document.getElementById('post-view-thumb-row');
+
+            let images = [];
+            if (post.imageUrl && post.imageUrl.length > 10) images.push(post.imageUrl);
+            if (Array.isArray(post.gallery)) images.push(...post.gallery);
+
+            if (images.length === 0) {
+                gallerySec.classList.add('hidden');
+            } else {
+                gallerySec.classList.remove('hidden');
+                mainImg.src = images[0];
+                thumbRow.innerHTML = images.map((src, idx) => `
+                    <button type="button" onclick="selectPostPhoto('${src}')" class="aspect-square rounded-xl overflow-hidden border-2 ${idx === 0 ? 'border-rosegold-500' : 'border-transparent'} hover:opacity-90 transition relative bg-gray-100 shadow-sm thumb-btn">
+                        <img src="${src}" class="w-full h-full object-cover">
+                    </button>
+                `).join('');
+            }
+
+            document.getElementById('view-board').classList.add('hidden');
+            document.getElementById('view-detail').classList.add('hidden');
+            document.getElementById('view-post-detail').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            lucide.createIcons();
+        };
+
+        window.selectPostPhoto = (src) => {
+            const mainImg = document.getElementById('post-view-main-img');
+            mainImg.style.opacity = '0.3';
+            setTimeout(() => {
+                mainImg.src = src;
+                mainImg.style.opacity = '1';
+            }, 120);
+
+            document.querySelectorAll('#post-view-thumb-row .thumb-btn').forEach(btn => {
+                const img = btn.querySelector('img');
+                if (img && img.src === src) {
+                    btn.classList.add('border-rosegold-500');
+                    btn.classList.remove('border-transparent');
+                } else {
+                    btn.classList.remove('border-rosegold-500');
+                    btn.classList.add('border-transparent');
+                }
+            });
+        };
+
+        window.openEditPostModal = () => {
+            if (!currentViewingPostId || !postCache[currentViewingPostId]) return;
+            const post = postCache[currentViewingPostId];
+
+            document.getElementById('edit-post-title-input').value = post.title || '';
+            document.getElementById('edit-post-content-input').value = post.content || '';
+
+            editUploadedPostImageData = null;
+            const preview = document.getElementById('edit-post-file-preview');
+            if (post.imageUrl && post.imageUrl.length > 10) {
+                preview.src = post.imageUrl;
+                preview.classList.remove('hidden');
+            } else {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+            document.getElementById('edit-post-file-input').value = '';
+            document.getElementById('modal-edit-post').classList.remove('hidden');
+        };
+
+        window.closeEditPostModal = () => {
+            document.getElementById('modal-edit-post').classList.add('hidden');
+            editUploadedPostImageData = null;
+        };
+
+        window.submitEditPostAction = async () => {
+            if (!currentViewingPostId) return;
+
+            const title = document.getElementById('edit-post-title-input').value.trim();
+            const content = document.getElementById('edit-post-content-input').value.trim();
+
+            if (!title || !content) return alert("제목과 내용을 모두 입력해 주세요.");
+
+            try {
+                const updatePayload = {
+                    title,
+                    content,
+                    updatedAt: serverTimestamp()
+                };
+
+                if (editUploadedPostImageData) {
+                    updatePayload.imageUrl = editUploadedPostImageData;
+                }
+
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'posts', currentViewingPostId), updatePayload);
+                alert("✅ 활동 소식이 수정되었습니다.");
+                closeEditPostModal();
+                postCache[currentViewingPostId] = { ...postCache[currentViewingPostId], ...updatePayload };
+                openPostDetail(currentViewingPostId);
+            } catch (err) {
+                console.error(err);
+                alert("수정 권한이 없거나 오류가 발생했습니다.");
+            }
+        };
+
+        window.deleteCurrentPost = async () => {
+            if (!currentViewingPostId) return;
+
+            if (!confirm("정말 이 활동 소식을 삭제하시겠습니까?\n삭제된 내용은 복구할 수 없습니다.")) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'posts', currentViewingPostId));
+                alert("🗑️ 게시글이 성공적으로 삭제되었습니다.");
+                currentViewingPostId = null;
+                switchToBoard();
+            } catch (err) {
+                console.error(err);
+                alert("삭제 권한이 없거나 오류가 발생했습니다.");
+            }
+        };
+
+        const loadBoardPosts = () => {
+            const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'posts');
+            onSnapshot(postsRef, (snapshot) => {
+                const container = document.getElementById('board-posts-container');
+                postCache = {};
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="col-span-full py-12 text-center text-gray-400 font-medium text-sm">아직 등록된 활동 소식이 없습니다. 첫 이야기를 남겨보세요! ✨</div>';
+                    return;
+                }
+
+                container.innerHTML = snapshot.docs.map(docSnap => {
+                    const post = { id: docSnap.id, ...docSnap.data() };
+                    postCache[docSnap.id] = post;
+
+                    return `
+                    <div onclick="openPostDetail('${post.id}')" class="group cursor-pointer bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md hover:border-rosegold-300 hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                        ${post.imageUrl ? `<img src="${post.imageUrl}" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500">` : ''}
+                        <div class="p-5 flex flex-col flex-1">
+                            <h4 class="font-black text-base text-gray-900 group-hover:text-rosegold-600 transition mb-2 truncate">${post.title || '제목 없음'}</h4>
+                            <p class="text-xs text-gray-600 line-clamp-2 mb-4 leading-relaxed font-medium flex-1">${post.content || ''}</p>
+                            <div class="pt-3 border-t border-gray-100 mt-auto flex items-center justify-between text-xs font-bold text-gray-400">
+                                <span>${post.authorName || '이웃'} 님</span>
+                                <span class="text-rosegold-500 font-extrabold group-hover:translate-x-0.5 transition-transform">자세히 보기 →</span>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            });
+        };
+
+        window.openApplyForm = () => document.getElementById('modal-apply-form').classList.remove('hidden');
+        window.closeApplyForm = () => document.getElementById('modal-apply-form').classList.add('hidden');
+        window.submitApplication = async () => {
+            const user = auth.currentUser;
+            const msg = document.getElementById('apply-message').value.trim();
+            if (!msg) return alert("신청 포부를 적어주세요!");
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'memberships', clubId), { status: 'pending', joinedAt: serverTimestamp() });
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'applications'), {
+                    userId: user.uid,
+                    userName: user.displayName || '이웃',
+                    message: msg,
+                    createdAt: serverTimestamp()
+                });
+                alert("✅ 가입 신청이 성공적으로 전달되었습니다!\n리더님의 승인을 기다려주세요.");
+                closeApplyForm();
+                checkUserMembership();
+            } catch (err) {
+                console.error(err);
+                alert("신청 중 오류가 발생했습니다.");
+            }
+        };
+
+        window.openWritePostModal = () => document.getElementById('modal-write-post').classList.remove('hidden');
+        window.closeWritePostModal = () => {
+            document.getElementById('modal-write-post').classList.add('hidden');
+            uploadedPostImageData = null;
+            document.getElementById('post-file-preview').classList.add('hidden');
+            document.getElementById('post-file-input').value = '';
+        };
+
+        const compressImage = (file, callback) => {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.82));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('post-file-input').addEventListener('change', (e) => {
+            compressImage(e.target.files[0], (data) => {
+                uploadedPostImageData = data;
+                const preview = document.getElementById('post-file-preview');
+                preview.src = data;
+                preview.classList.remove('hidden');
+            });
+        });
+
+        document.getElementById('edit-post-file-input').addEventListener('change', (e) => {
+            compressImage(e.target.files[0], (data) => {
+                editUploadedPostImageData = data;
+                const preview = document.getElementById('edit-post-file-preview');
+                preview.src = data;
+                preview.classList.remove('hidden');
+            });
+        });
+
+        window.submitPostAction = async () => {
+            const user = auth.currentUser;
+            const title = document.getElementById('post-title-input').value.trim();
+            const content = document.getElementById('post-content-input').value.trim();
+            if (!title || !content) return alert("제목과 내용을 모두 적어주세요!");
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'posts'), {
+                    title,
+                    content,
+                    imageUrl: uploadedPostImageData || '',
+                    authorName: user.displayName || '이웃',
+                    authorId: user.uid,
+                    createdAt: serverTimestamp()
+                });
+                alert("✅ 소식이 등록되었습니다!");
+                closeWritePostModal();
+                document.getElementById('post-title-input').value = '';
+                document.getElementById('post-content-input').value = '';
+            } catch (err) {
+                alert("게시글 등록에 실패했습니다.");
+            }
+        };
+
+        window.openEditClubModal = () => {
+            if (!currentClubData) return;
+            document.getElementById('edit-club-title').value = currentClubData.name || currentClubData.title || '';
+            document.getElementById('edit-club-category').value = currentClubData.category || 'son';
+            document.getElementById('edit-club-place').value = currentClubData.place || '';
+            document.getElementById('edit-club-desc').value = currentClubData.intro || currentClubData.description || '';
+
+            currentEditClubPhotoData = null;
+            const preview = document.getElementById('edit-club-photo-preview');
+            if (currentClubData.imageUrl && currentClubData.imageUrl.length > 10) {
+                preview.src = currentClubData.imageUrl;
+                preview.classList.remove('hidden');
+            } else {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+            document.getElementById('edit-club-photo-input').value = '';
+
+            document.getElementById('modal-edit-club').classList.remove('hidden');
+        };
+
+        window.closeEditClubModal = () => {
+            document.getElementById('modal-edit-club').classList.add('hidden');
+            currentEditClubPhotoData = null;
+        };
+
+        document.getElementById('edit-club-photo-input').addEventListener('change', (e) => {
+            compressImage(e.target.files[0], (data) => {
+                currentEditClubPhotoData = data;
+                const preview = document.getElementById('edit-club-photo-preview');
+                preview.src = data;
+                preview.classList.remove('hidden');
+            });
+        });
+
+        window.submitEditClub = async () => {
+            const title = document.getElementById('edit-club-title').value.trim();
+            const category = document.getElementById('edit-club-category').value;
+            const place = document.getElementById('edit-club-place').value.trim();
+            const desc = document.getElementById('edit-club-desc').value.trim();
+
+            if (!title || !desc) return alert("동아리 명칭과 소개글을 모두 입력해 주세요!");
+
+            try {
+                const updateData = {
+                    name: title,
+                    title: title,
+                    category,
+                    place: place || '기장군 일대',
+                    intro: desc,
+                    description: desc,
+                    updatedAt: serverTimestamp()
+                };
+
+                if (currentEditClubPhotoData) {
+                    updateData.imageUrl = currentEditClubPhotoData;
+                }
+
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId), updateData);
+                alert("✅ 동아리 정보가 성공적으로 수정되었습니다!");
+                closeEditClubModal();
+                loadClubDetails();
+            } catch (err) {
+                console.error(err);
+                alert("수정 중 오류가 발생했습니다. 권한을 확인해 주세요.");
+            }
+        };
+
+        window.deleteClubAction = async () => {
+            if (!confirm("정말 이 동아리를 삭제하시겠습니까?\n동아리에 속한 모든 활동 소식도 함께 사라지며 복구할 수 없습니다.")) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId));
+                alert("🗑️ 동아리가 성공적으로 삭제되었습니다.");
+                location.href = 'club.html';
+            } catch (err) {
+                console.error(err);
+                alert("삭제 권한이 없거나 오류가 발생했습니다.");
+            }
+        };
+
+        loadClubDetails();
+    </script>
+</body>
+</html>

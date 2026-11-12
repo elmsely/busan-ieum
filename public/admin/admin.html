@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페이지 자동 이동 중...</title>
+    
+    <!-- 🌟 에러 방지 핵심 1: HTML 자체 기능으로 0초 만에 index.html로 강제 이동시킵니다 -->
+    <meta http-equiv="refresh" content="0; url=index.html">
+    
+    <!-- 🌟 에러 방지 핵심 2: 혹시나 위 코드가 안 먹힐 경우를 대비한 자바스크립트 2중 안전망 -->
+    <script>
+        window.location.replace("index.html");
+    </script>
+</head>
+<body style="background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Noto Sans KR', sans-serif; color: #6c4a4a; margin: 0;">
+    
+    <div style="text-align: center;">
+        <h2 style="font-weight: 900; font-size: 24px; margin-bottom: 10px;">안전망 작동 중! 🛡️</h2>
+        <p style="color: #a0aec0; font-weight: 500;">올바른 관리자 메인 화면으로 자동 이동하고 있습니다...</p>
+    </div>
+
+</body>
+</html>

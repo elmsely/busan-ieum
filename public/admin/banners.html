@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 팝업(배너) 관리</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 웹 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 🌟 공통 메뉴/헤더/로그인 컴포넌트 불러오기 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        rosegold: {
+                            50: '#fff0f0',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#e58e8e', 
+                            600: '#d97777', 
+                            700: '#be123c',
+                            800: '#6c4a4a', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 부드러운 스크롤바 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #e58e8e; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97777; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- 🌟 1. 공통 사이드바 컴포넌트 -->
+    <admin-sidebar active="banners"></admin-sidebar>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden w-full">
+        
+        <!-- 🌟 2. 공통 헤더 컴포넌트 -->
+        <admin-header title="메인 화면 광고 관리"></admin-header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                        <i data-lucide="layers" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">전체 배너 수</p>
+                        <h3 id="stat-total-banners" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 flex-shrink-0">
+                        <i data-lucide="play-circle" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">현재 노출 중</p>
+                        <h3 id="stat-active-banners" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-500 flex-shrink-0">
+                        <i data-lucide="calendar-clock" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">노출 대기(예약)</p>
+                        <h3 id="stat-scheduled-banners" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-rosegold-50 flex items-center justify-center text-rosegold-500 flex-shrink-0">
+                        <i data-lucide="mouse-pointer-click" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">총 클릭 수</p>
+                        <h3 id="stat-total-clicks" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <select class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 위치</option>
+                        <option value="main_popup">메인 팝업</option>
+                        <option value="main_slide">메인 슬라이드</option>
+                        <option value="sub_banner">서브 배너</option>
+                    </select>
+                    
+                    <select class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 상태</option>
+                        <option value="active">노출 중</option>
+                        <option value="scheduled">대기 중</option>
+                        <option value="ended">종료됨</option>
+                    </select>
+
+                    <div class="relative w-full sm:w-auto mt-2 sm:mt-0">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="배너명 검색" class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-rosegold-300 shadow-sm w-full sm:w-64 md:w-80 transition-all">
+                    </div>
+                </div>
+
+                <div class="flex gap-2 w-full lg:w-auto mt-2 lg:mt-0">
+                    <button onclick="openBannerModal()" class="w-full lg:w-auto justify-center px-4 py-2 bg-rosegold-500 text-white text-sm font-bold rounded-lg hover:bg-rosegold-600 transition flex items-center gap-2 shadow-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i> 새 팝업/배너 등록
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100">
+                                <th class="px-6 py-4 font-medium w-12 text-center">
+                                    <input type="checkbox" id="check-all" onchange="toggleAll(this)" class="rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500 cursor-pointer">
+                                </th>
+                                <th class="px-6 py-4 font-medium w-16 text-center">순서</th>
+                                <th class="px-6 py-4 font-medium w-24 text-center">미디어</th>
+                                <th class="px-6 py-4 font-medium">배너명</th>
+                                <th class="px-6 py-4 font-medium">노출 위치</th>
+                                <th class="px-6 py-4 font-medium">노출 기간</th>
+                                <th class="px-6 py-4 font-medium text-center">클릭수</th>
+                                <th class="px-6 py-4 font-medium text-center">상태</th>
+                                <th class="px-6 py-4 font-medium text-center">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="banner-list-body" class="text-sm text-gray-700">
+                            <tr>
+                                <td colspan="9" class="px-6 py-12 text-center text-gray-500 font-medium">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rosegold-500"></div>
+                                        데이터를 불러오는 중입니다.
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">전체 <span id="stat-total-bottom" class="font-bold text-gray-800">0</span>개 중 1-10</p>
+                    <div class="flex items-center gap-1">
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-rosegold-500 text-white font-bold transition">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">3</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button onclick="activateSelected()" class="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-200 text-emerald-600 text-sm font-bold rounded-lg hover:bg-emerald-50 transition shadow-sm whitespace-nowrap">선택 노출 활성화</button>
+                <button onclick="deactivateSelected()" class="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 transition shadow-sm whitespace-nowrap">선택 노출 중지</button>
+                <button onclick="deleteSelected()" class="w-full sm:w-auto px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-bold rounded-lg hover:bg-red-50 transition shadow-sm whitespace-nowrap mt-2 sm:mt-0">선택 삭제</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 🌟 3. 공통 로그인 모달 컴포넌트 -->
+    <admin-login-modal></admin-login-modal>
+
+    <!-- 🌟 새 팝업/배너 등록 모달 -->
+    <div id="modal-banner" class="fixed inset-0 bg-black/60 z-[130] hidden flex items-center justify-center p-4 backdrop-blur-md transition-all duration-300">
+        <div class="bg-white w-full max-w-2xl rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scrollbar animate-[fadeIn_0.3s_ease-out]">
+            <button onclick="closeBannerModal()" class="absolute top-4 right-4 md:top-6 md:right-6 text-gray-400 hover:text-gray-600 z-10"><i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i></button>
+            <div class="mb-6 md:mb-8 mt-2 md:mt-0">
+                <h3 id="banner-modal-title" class="text-xl md:text-2xl font-black text-gray-800 flex items-center gap-2">
+                    <i data-lucide="image-plus" class="text-rosegold-500 w-5 h-5 md:w-6 md:h-6"></i> 새 팝업/배너 등록
+                </h3>
+                <p class="text-xs md:text-sm text-gray-500 font-medium mt-1 md:mt-2">모집 광고, 행사 안내 등 다양한 소식을 팝업이나 배너로 등록하세요. (동영상 및 GIF 지원)</p>
+            </div>
+            
+            <div class="space-y-4 md:space-y-6">
+                <!-- 미디어 업로드 -->
+                <div>
+                    <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1">배너 미디어 (사진 또는 짧은 동영상)</label>
+                    <!-- 🌟 세로형 규격 안내 문구 🌟 -->
+                    <p class="text-[10px] md:text-xs text-rosegold-500 font-bold mb-2 md:mb-3">※ 권장 규격: 세로형 3:4 비율 (예: 600x800px)</p>
+                    <button onclick="document.getElementById('banner-media-input').click()" class="w-full h-36 md:h-48 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl md:rounded-[1.5rem] flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-rosegold-300 transition group overflow-hidden relative shadow-inner">
+                        <i data-lucide="upload-cloud" class="w-8 h-8 md:w-10 md:h-10 mb-1 md:mb-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-xs md:text-sm text-center">클릭하여 파일 선택<br><span class="text-[10px] md:text-xs font-normal text-gray-400 mt-0.5 inline-block">JPG, PNG, GIF, MP4 지원</span></span>
+                        <img id="banner-media-preview-img" class="absolute inset-0 w-full h-full object-cover hidden">
+                        <video id="banner-media-preview-vid" class="absolute inset-0 w-full h-full object-cover hidden" autoplay loop muted playsinline></video>
+                    </button>
+                    <input type="file" id="banner-media-input" class="hidden" accept="image/*, video/mp4, video/webm">
+                </div>
+                <!-- 입력 폼 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">배너 제목 (관리용)</label>
+                        <input type="text" id="banner-title" placeholder="예) 봄맞이 플리마켓 안내" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-bold text-sm md:text-base transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">노출 위치</label>
+                        <select id="banner-position" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-medium text-gray-700 text-sm md:text-base transition">
+                            <option value="main_popup">메인 팝업 (중앙)</option>
+                            <option value="main_slide">메인 슬라이드</option>
+                            <option value="sub_banner">서브 배너</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">시작일</label>
+                        <input type="date" id="banner-start" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-medium text-gray-700 text-sm md:text-base transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">종료일</label>
+                        <input type="date" id="banner-end" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-medium text-gray-700 text-sm md:text-base transition">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">클릭 시 이동할 링크 URL (선택사항)</label>
+                        <input type="url" id="banner-link" placeholder="예) https://talent.unifactory.kr/market.html" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-medium text-sm md:text-base transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">노출 순서 (낮을수록 먼저 노출)</label>
+                        <input type="number" id="banner-order" value="1" min="1" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-medium text-sm md:text-base font-bold text-rosegold-600 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">노출 상태</label>
+                    <select id="banner-status" class="w-full p-3 md:p-4 bg-gray-50 border border-gray-100 rounded-lg md:rounded-xl focus:border-rosegold-400 outline-none font-medium text-gray-700 text-sm md:text-base transition">
+                        <option value="active">즉시 노출 (운영 중)</option>
+                        <option value="scheduled">노출 대기 (예약)</option>
+                        <option value="ended">노출 종료</option>
+                    </select>
+                </div>
+
+                <button onclick="submitBanner()" class="w-full bg-rosegold-500 text-white font-black text-lg md:text-xl py-4 md:py-5 mt-2 rounded-xl md:rounded-[1.25rem] hover:bg-rosegold-600 transition shadow-lg active:scale-95">배너 등록/저장하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- 🔥 파이어베이스 실시간 데이터 연동 (배너 관리) 🔥 -->
+    <script type="module">
+        import { db, auth, appId } from '../firebase-config.js';
+        import { collection, onSnapshot, updateDoc, doc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        window.openLoginModal = () => document.getElementById('modal-login').classList.remove('hidden');
+        window.closeLoginModal = () => document.getElementById('modal-login').classList.add('hidden');
+
+        window.logoutAdmin = () => {
+            if(confirm("관리자 계정에서 로그아웃 하시겠습니까?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
+
+        window.loginAdmin = () => {
+            const id = document.getElementById('login-id').value;
+            const pw = document.getElementById('login-pw').value;
+            if (id === 'admin') {
+                signInWithEmailAndPassword(auth, 'admin@internal.system', pw).then(() => { 
+                    closeLoginModal(); 
+                }).catch(() => alert('비밀번호가 일치하지 않습니다.'));
+            } else { 
+                alert('ID 확인 (admin)'); 
+            }
+        };
+
+        window.toggleAll = (source) => {
+            const checkboxes = document.querySelectorAll('.banner-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        };
+
+        const getSelectedIds = () => {
+            const checkboxes = document.querySelectorAll('.banner-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        };
+
+        window.activateSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("활성화할 배너를 먼저 선택해주세요.");
+            if (!confirm(`선택한 ${ids.length}개의 배너를 '노출 중' 상태로 일괄 변경하시겠습니까?`)) return;
+
+            try {
+                for (const id of ids) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'banners', id), { 
+                        status: 'active' 
+                    });
+                }
+                alert("✅ 노출 활성화 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다. 권한을 확인해주세요.");
+            }
+        };
+
+        window.deactivateSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("노출을 중지할 배너를 먼저 선택해주세요.");
+            if (!confirm(`선택한 ${ids.length}개의 배너를 '노출 종료' 상태로 일괄 변경하시겠습니까?\n(더 이상 메인 홈페이지에 보이지 않습니다.)`)) return;
+
+            try {
+                for (const id of ids) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'banners', id), { 
+                        status: 'ended' 
+                    });
+                }
+                alert("✅ 노출 중지 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다. 권한을 확인해주세요.");
+            }
+        };
+
+        window.deleteSelected = async () => {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert("삭제할 배너를 먼저 선택해주세요.");
+            if (!confirm(`경고: 선택한 ${ids.length}개의 배너를 데이터베이스에서 완전히 삭제합니다.\n이 작업은 되돌릴 수 없습니다. 진행할까요?`)) return;
+
+            try {
+                for (const id of ids) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'banners', id));
+                }
+                alert("🗑️ 삭제 처리가 완료되었습니다.");
+                document.getElementById('check-all').checked = false;
+            } catch (e) {
+                console.error(e);
+                alert("❌ 처리 중 오류가 발생했습니다. 권한을 확인해주세요.");
+            }
+        };
+
+        let selectedBannerMedia = null;
+        let selectedMediaType = 'image';
+        let editingBannerId = null;
+
+        window.openBannerModal = (bannerId = null) => {
+            editingBannerId = bannerId;
+            const modal = document.getElementById('modal-banner');
+            const titleEl = document.getElementById('banner-modal-title');
+            
+            if (bannerId) {
+                titleEl.innerHTML = `<i data-lucide="edit" class="text-rosegold-500 w-5 h-5 md:w-6 md:h-6"></i> 팝업/배너 수정`;
+                const banner = window.currentBanners.find(b => b.id === bannerId);
+                if(banner) {
+                    document.getElementById('banner-title').value = banner.title || '';
+                    document.getElementById('banner-link').value = banner.linkUrl || '';
+                    document.getElementById('banner-start').value = banner.startDate || '';
+                    document.getElementById('banner-end').value = banner.endDate || '';
+                    document.getElementById('banner-position').value = banner.position || 'main_popup';
+                    document.getElementById('banner-status').value = banner.status || 'active';
+                    document.getElementById('banner-order').value = banner.order || 1;
+                    
+                    selectedBannerMedia = banner.imageUrl || null;
+                    selectedMediaType = banner.mediaType || (selectedBannerMedia && selectedBannerMedia.startsWith('data:video') ? 'video' : 'image');
+                    
+                    const imgPreview = document.getElementById('banner-media-preview-img');
+                    const vidPreview = document.getElementById('banner-media-preview-vid');
+
+                    if (selectedBannerMedia) {
+                        if (selectedMediaType === 'video') {
+                            imgPreview.classList.add('hidden');
+                            vidPreview.src = selectedBannerMedia;
+                            vidPreview.classList.remove('hidden');
+                        } else {
+                            vidPreview.classList.add('hidden');
+                            imgPreview.src = selectedBannerMedia;
+                            imgPreview.classList.remove('hidden');
+                        }
+                    } else {
+                        imgPreview.src = ''; imgPreview.classList.add('hidden');
+                        vidPreview.src = ''; vidPreview.classList.add('hidden');
+                    }
+                }
+            } else {
+                titleEl.innerHTML = `<i data-lucide="image-plus" class="text-rosegold-500 w-5 h-5 md:w-6 md:h-6"></i> 새 팝업/배너 등록`;
+                document.getElementById('banner-title').value = '';
+                document.getElementById('banner-link').value = '';
+                document.getElementById('banner-start').value = '';
+                document.getElementById('banner-end').value = '';
+                document.getElementById('banner-position').value = 'main_popup';
+                document.getElementById('banner-status').value = 'active';
+                document.getElementById('banner-order').value = 1;
+                
+                selectedBannerMedia = null;
+                selectedMediaType = 'image';
+                
+                const imgPreview = document.getElementById('banner-media-preview-img');
+                const vidPreview = document.getElementById('banner-media-preview-vid');
+                imgPreview.src = ''; imgPreview.classList.add('hidden');
+                vidPreview.src = ''; vidPreview.classList.add('hidden');
+            }
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeBannerModal = () => {
+            document.getElementById('modal-banner').classList.add('hidden');
+        };
+
+        document.getElementById('banner-media-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedMediaType = file.type.startsWith('video/') ? 'video' : 'image';
+                const reader = new FileReader();
+                
+                reader.onload = (event) => {
+                    selectedBannerMedia = event.target.result;
+                    const imgPreview = document.getElementById('banner-media-preview-img');
+                    const vidPreview = document.getElementById('banner-media-preview-vid');
+
+                    if (selectedMediaType === 'video') {
+                        imgPreview.classList.add('hidden');
+                        vidPreview.src = selectedBannerMedia;
+                        vidPreview.classList.remove('hidden');
+                    } else {
+                        vidPreview.classList.add('hidden');
+                        imgPreview.src = selectedBannerMedia;
+                        imgPreview.classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        window.submitBanner = async () => {
+            const title = document.getElementById('banner-title').value;
+            const position = document.getElementById('banner-position').value;
+            const startDate = document.getElementById('banner-start').value;
+            const endDate = document.getElementById('banner-end').value;
+            const linkUrl = document.getElementById('banner-link').value;
+            const status = document.getElementById('banner-status').value;
+            const order = parseInt(document.getElementById('banner-order').value) || 1;
+
+            if (!title) return alert("배너 제목을 입력해주세요!");
+            if (!selectedBannerMedia && !editingBannerId) return alert("배너 사진이나 영상을 등록해주세요!");
+
+            const bannerData = {
+                title, position, startDate, endDate, linkUrl, status, order,
+                mediaType: selectedMediaType || 'image',
+                updatedAt: serverTimestamp()
+            };
+            if (selectedBannerMedia) bannerData.imageUrl = selectedBannerMedia;
+
+            try {
+                if (editingBannerId) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'banners', editingBannerId), bannerData);
+                    alert("✅ 성공적으로 수정되었습니다!");
+                } else {
+                    bannerData.clicks = 0;
+                    bannerData.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'banners'), bannerData);
+                    alert("✅ 성공적으로 새 배너가 등록되었습니다!\n(메인 홈페이지에서 확인해보세요.)");
+                }
+                closeBannerModal();
+            } catch(e) {
+                console.error(e);
+                alert("❌ 저장 중 오류가 발생했습니다. 권한 설정을 확인하세요.");
+            }
+        };
+
+        // 실시간 동기화
+        onAuthStateChanged(auth, (user) => {
+            const tbody = document.getElementById('banner-list-body');
+
+            if (user && user.email === 'admin@internal.system') {
+                const bannersRef = collection(db, 'artifacts', appId, 'public', 'data', 'banners');
+                onSnapshot(bannersRef, (snapshot) => {
+                    const banners = [];
+                    let activeCount = 0;
+                    let scheduledCount = 0;
+                    let totalClicks = 0;
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        banners.push({ id: doc.id, ...data });
+                        if (data.status === 'active') activeCount++;
+                        if (data.status === 'scheduled') scheduledCount++;
+                        totalClicks += (data.clicks || 0);
+                    });
+                    
+                    banners.sort((a, b) => {
+                        const orderA = parseInt(a.order) || 1;
+                        const orderB = parseInt(b.order) || 1;
+                        
+                        if (orderA !== orderB) return orderA - orderB; 
+                        
+                        const tA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
+                        const tB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
+                        return tB - tA; 
+                    });
+                    
+                    window.currentBanners = banners; 
+
+                    document.getElementById('stat-total-banners').innerText = banners.length;
+                    document.getElementById('stat-total-bottom').innerText = banners.length;
+                    document.getElementById('stat-active-banners').innerText = activeCount;
+                    document.getElementById('stat-scheduled-banners').innerText = scheduledCount;
+                    document.getElementById('stat-total-clicks').innerText = totalClicks.toLocaleString();
+
+                    if (banners.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-gray-500 font-medium">현재 등록된 배너가 없습니다.<br><span class="text-sm mt-1 inline-block text-gray-400">상단의 '새 팝업/배너 등록' 버튼을 눌러 추가해주세요.</span></td></tr>`;
+                    } else {
+                        tbody.innerHTML = banners.map(banner => {
+                            let statusBadge = '';
+                            if (banner.status === 'active') statusBadge = '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">노출 중</span>';
+                            else if (banner.status === 'scheduled') statusBadge = '<span class="px-2.5 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">대기 중</span>';
+                            else statusBadge = '<span class="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold">종료됨</span>';
+
+                            let thumbHtml = '';
+                            if (banner.imageUrl) {
+                                if (banner.mediaType === 'video' || banner.imageUrl.startsWith('data:video')) {
+                                    thumbHtml = `<video src="${banner.imageUrl}" class="w-full h-full object-cover" muted loop autoplay playsinline></video>`;
+                                } else {
+                                    thumbHtml = `<img src="${banner.imageUrl}" class="w-full h-full object-cover">`;
+                                }
+                            } else {
+                                thumbHtml = `<i data-lucide="image" class="w-5 h-5"></i>`;
+                            }
+
+                            return `
+                                <tr class="border-b border-gray-50 hover:bg-rosegold-50/30 transition ${banner.status === 'ended' ? 'opacity-60 bg-gray-50' : ''}">
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-center"><input type="checkbox" value="${banner.id}" class="banner-checkbox rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500 cursor-pointer"></td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-center font-black text-rosegold-500 text-sm md:text-base">
+                                        ${banner.order || 1}
+                                    </td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4">
+                                        <div class="w-16 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center text-gray-400 border border-gray-200">
+                                            ${thumbHtml}
+                                        </div>
+                                    </td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4">
+                                        <p class="font-bold text-gray-800 text-sm md:text-base truncate max-w-[150px] md:max-w-[200px] mb-0.5">${banner.title || '제목 없음'}</p>
+                                        <a href="${banner.linkUrl || '#'}" target="_blank" class="text-[10px] md:text-xs text-blue-500 hover:underline truncate inline-block max-w-[150px] md:max-w-[200px]">링크: ${banner.linkUrl || '설정안됨'}</a>
+                                    </td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 text-xs md:text-sm whitespace-nowrap">${banner.position === 'main_popup' ? '메인 팝업 (중앙)' : (banner.position || '미지정')}</td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-gray-500 text-[10px] md:text-xs whitespace-nowrap">${banner.startDate || '-'} ~ ${banner.endDate || '-'}</td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-center font-bold text-gray-600 text-xs md:text-sm">${(banner.clicks || 0).toLocaleString()}</td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap">${statusBadge}</td>
+                                    <td class="px-4 md:px-6 py-3 md:py-4 text-center">
+                                        <button onclick="openBannerModal('${banner.id}')" class="text-gray-400 hover:text-rosegold-600 transition" title="상세보기/수정"><i data-lucide="edit" class="w-4 h-4 md:w-5 md:h-5 mx-auto"></i></button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                        lucide.createIcons();
+                    }
+                }, (error) => console.error("배너 데이터 가져오기 실패:", error));
+            } else {
+                if(tbody) tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-20 text-center text-gray-400 font-medium italic">관리자 로그인이 필요합니다. 상단의 로그인 버튼을 눌러주세요.</td></tr>';
+                openLoginModal(); 
+            }
+        });
+    </script>
+</body>
+</html>

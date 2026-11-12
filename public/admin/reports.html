@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산이음 - 문의/신고 관리</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 웹 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 🌟 공통 메뉴/헤더/로그인 컴포넌트 불러오기 -->
+    <script src="components.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        rosegold: {
+                            50: '#fff0f0', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+                            400: '#fb7185', 500: '#e58e8e', 600: '#d97777', 700: '#be123c',
+                            800: '#6c4a4a', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 부드러운 스크롤바 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #e58e8e; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97777; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- 🌟 1. 공통 사이드바 컴포넌트 -->
+    <admin-sidebar active="reports"></admin-sidebar>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden w-full">
+        
+        <!-- 🌟 2. 공통 헤더 컴포넌트 -->
+        <admin-header title="건의 / 신고함"></admin-header>
+
+        <!-- 스크롤 가능한 메인 내용 -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-rosegold-50 flex items-center justify-center text-rosegold-500 flex-shrink-0">
+                        <i data-lucide="message-square" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">전체 문의/신고</p>
+                        <h3 id="stat-total-reports" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-500 flex-shrink-0">
+                        <i data-lucide="help-circle" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">미처리 내역</p>
+                        <h3 id="stat-pending-reports" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">신규 신고</p>
+                        <h3 id="stat-new-reports" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 flex-shrink-0">
+                        <i data-lucide="check-circle" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm text-gray-500 font-medium">처리 완료</p>
+                        <h3 id="stat-resolved-reports" class="text-xl md:text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 필터 및 검색 영역 -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex flex-wrap items-center gap-3">
+                    <select class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 유형</option>
+                        <option value="inquiry">일반 문의</option>
+                        <option value="report">신고 접수</option>
+                    </select>
+                    
+                    <select class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 font-medium focus:outline-none focus:border-rosegold-300 shadow-sm cursor-pointer">
+                        <option value="all">전체 상태</option>
+                        <option value="pending">대기 중 (미처리)</option>
+                        <option value="resolved">처리 완료</option>
+                    </select>
+
+                    <div class="relative w-full md:w-auto">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="제목, 작성자 검색" class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-rosegold-300 focus:ring-1 focus:ring-rosegold-300 shadow-sm w-full md:w-80 transition-all">
+                    </div>
+                </div>
+
+                <button class="w-full md:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 shadow-sm">
+                    <i data-lucide="download" class="w-4 h-4"></i> 엑셀 다운로드
+                </button>
+            </div>
+
+            <!-- 문의/신고 목록 테이블 영역 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100">
+                                <th class="px-6 py-4 font-medium w-12 text-center"><input type="checkbox" class="rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500"></th>
+                                <th class="px-6 py-4 font-medium text-center w-24">유형</th>
+                                <th class="px-6 py-4 font-medium">제목 / 내용</th>
+                                <th class="px-6 py-4 font-medium">작성자</th>
+                                <th class="px-6 py-4 font-medium">작성일</th>
+                                <th class="px-6 py-4 font-medium">상태</th>
+                                <th class="px-6 py-4 font-medium text-center">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-list-body" class="text-sm text-gray-700">
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-gray-500 font-medium">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rosegold-500 mx-auto"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">전체 <span id="stat-total-bottom" class="font-bold text-gray-800">0</span>개 중 1-10</p>
+                    <div class="flex items-center gap-1">
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-rosegold-500 text-white font-bold transition">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">3</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button class="px-4 py-2 bg-white border border-gray-200 text-emerald-600 text-sm font-bold rounded-lg hover:bg-emerald-50 transition shadow-sm">선택 일괄 처리 완료</button>
+                <button class="px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-bold rounded-lg hover:bg-red-50 transition shadow-sm">선택 삭제</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 🌟 3. 공통 로그인 모달 컴포넌트 -->
+    <admin-login-modal></admin-login-modal>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- 🔥 파이어베이스 실시간 데이터 연동 (문의/신고 관리) 🔥 -->
+    <script type="module">
+        import { db, auth, appId } from '../firebase-config.js';
+        import { collection, onSnapshot, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        window.openLoginModal = () => document.getElementById('modal-login').classList.remove('hidden');
+        window.closeLoginModal = () => document.getElementById('modal-login').classList.add('hidden');
+
+        window.logoutAdmin = () => {
+            if(confirm("관리자 계정에서 로그아웃 하시겠습니까?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
+
+        window.loginAdmin = () => {
+            const id = document.getElementById('login-id').value;
+            const pw = document.getElementById('login-pw').value;
+            if (id === 'admin') {
+                signInWithEmailAndPassword(auth, 'admin@internal.system', pw).then(() => { 
+                    closeLoginModal(); 
+                }).catch(() => alert('비밀번호가 올바르지 않습니다.'));
+            } else { 
+                alert('ID 확인 (admin)'); 
+            }
+        };
+
+        // 실시간 동기화 시작
+        onAuthStateChanged(auth, (user) => {
+            const tbody = document.getElementById('report-list-body');
+            
+            if (user && user.email === 'admin@internal.system') {
+                const reportsRef = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+                onSnapshot(reportsRef, (snapshot) => {
+                    const reports = [];
+                    let pendingCount = 0;
+                    let newReportCount = 0;
+                    let resolvedCount = 0;
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        reports.push({ id: doc.id, ...data });
+                        
+                        if (data.status === 'pending') {
+                            pendingCount++;
+                            if (data.type === 'report') newReportCount++;
+                        } else if (data.status === 'resolved') {
+                            resolvedCount++;
+                        }
+                    });
+
+                    // 방어 코드 적용 정렬
+                    reports.sort((a, b) => {
+                        const tA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
+                        const tB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
+                        return tB - tA;
+                    });
+
+                    // 상단 통계 업데이트
+                    document.getElementById('stat-total-reports').innerText = reports.length;
+                    document.getElementById('stat-pending-reports').innerText = pendingCount;
+                    document.getElementById('stat-new-reports').innerText = newReportCount;
+                    document.getElementById('stat-resolved-reports').innerText = resolvedCount;
+                    document.getElementById('stat-total-bottom').innerText = reports.length;
+
+                    // 사이드바 배지 알림 (미처리 문의/신고 건)
+                    const badge = document.getElementById('badge-report-count');
+                    if(badge) {
+                        if(pendingCount > 0) {
+                            badge.innerText = `${pendingCount}건`;
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    }
+
+                    // 테이블 리스트 업데이트
+                    if (reports.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-gray-500 font-medium">아직 접수된 문의나 신고가 없습니다.</td></tr>`;
+                    } else {
+                        tbody.innerHTML = reports.map(report => {
+                            let typeHtml = report.type === 'report' 
+                                ? '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">신고</span>' 
+                                : '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">문의</span>';
+
+                            let statusBadge = report.status === 'pending' 
+                                ? '<span class="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold whitespace-nowrap">대기 중</span>' 
+                                : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold whitespace-nowrap">처리 완료</span>';
+
+                            let dateStr = '-';
+                            if(report.createdAt && typeof report.createdAt.toDate === 'function') {
+                                const d = report.createdAt.toDate();
+                                dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                            }
+
+                            return `
+                                <tr class="border-b border-gray-50 hover:bg-rosegold-50/30 transition ${report.status === 'pending' ? 'bg-red-50/10' : ''}">
+                                    <td class="px-6 py-4 text-center"><input type="checkbox" class="rounded border-gray-300 text-rosegold-500 focus:ring-rosegold-500"></td>
+                                    <td class="px-6 py-4 text-center">${typeHtml}</td>
+                                    <td class="px-6 py-4">
+                                        <p class="font-bold text-gray-800 truncate w-48 sm:w-64 md:w-80 cursor-pointer hover:text-rosegold-600 transition" title="${report.content || ''}">${report.title || '제목 없음'}</p>
+                                        <p class="text-[10px] text-gray-400 truncate w-48 sm:w-64 md:w-80">${report.content || ''}</p>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600 whitespace-nowrap">${report.authorName || '익명'}</td>
+                                    <td class="px-6 py-4 text-gray-500 text-xs whitespace-nowrap">${dateStr}</td>
+                                    <td class="px-6 py-4">${statusBadge}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            ${report.status === 'pending' ? `
+                                                <button onclick="resolveReport('${report.id}')" class="px-3 py-1.5 bg-rosegold-500 text-white text-xs font-bold rounded hover:bg-rosegold-600 transition shadow-sm whitespace-nowrap">답변/처리</button>
+                                            ` : `
+                                                <button class="text-gray-400 hover:text-rosegold-600 transition" title="내역 보기"><i data-lucide="file-text" class="w-5 h-5 mx-auto"></i></button>
+                                            `}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                        lucide.createIcons();
+                    }
+                }, (error) => console.error("문의/신고 데이터 가져오기 실패:", error));
+            } else {
+                if(tbody) tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-20 text-center text-gray-400 font-medium italic">관리자 로그인이 필요합니다. 상단의 로그인 버튼을 눌러주세요.</td></tr>';
+                openLoginModal(); // 자동 팝업
+            }
+        });
+
+        // 전역 함수: 처리 완료 처리
+        window.resolveReport = async (reportId) => {
+            if(confirm('이 문의/신고를 처리 완료 상태로 변경하시겠습니까?')) {
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reports', reportId), {
+                        status: 'resolved'
+                    });
+                    alert('처리 완료되었습니다.');
+                } catch(e) {
+                    console.error(e);
+                    alert('상태 변경에 실패했습니다.');
+                }
+            }
+        };
+    </script>
+</body>
+</html>
