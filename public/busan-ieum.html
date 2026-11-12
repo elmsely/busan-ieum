@@ -39,7 +39,7 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col relative">
 
-    <!-- 상단 공통 네비게이션 ('부산이음' 메뉴 활성화) -->
+    <!-- 상단 공통 네비게이션 ('스토리 / 부산이음' 메뉴 활성화) -->
     <public-nav active="busan-ieum"></public-nav>
 
     <!-- [화면 1] 메인 홈 및 이야기 피드 목록 화면 -->
@@ -108,7 +108,7 @@
                     </button>
                 </div>
 
-                <!-- 실시간 게시글 그리드 목록 (모바일 친화적 즉시 렌더링) -->
+                <!-- 실시간 게시글 그리드 목록 -->
                 <div id="story-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     <div class="col-span-full py-16 text-center text-gray-400 font-medium text-sm">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rosegold-500 mx-auto mb-3"></div>
@@ -287,7 +287,7 @@
     <public-footer></public-footer>
     <public-modals></public-modals>
 
-    <!-- 파이어베이스 스크립트 (모바일 로딩 지연 완벽 방어) -->
+    <!-- 파이어베이스 스크립트 -->
     <script type="module">
         import { db, auth, appId } from './firebase-config.js';
         import { onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -300,10 +300,14 @@
 
         lucide.createIcons();
 
-        // 모바일/PC 공용 익명 세션 보장
+        // 정식 회원 로그인 세션이 로드될 시간을 보장한 후 비로그인 시에만 익명 읽기 권한 연결
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                signInAnonymously(auth).catch(() => {});
+                setTimeout(() => {
+                    if (!auth.currentUser) {
+                        signInAnonymously(auth).catch(() => {});
+                    }
+                }, 800);
             }
         });
 
@@ -415,7 +419,7 @@
             if (!title || !content) return alert("제목과 상세 이야기를 모두 입력해 주세요!");
 
             try {
-                let authorName = user.displayName || '이웃';
+                let authorName = localStorage.getItem('busan_ieum_user_name') || user.displayName || '이웃';
                 try {
                     const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
                     if (profileDoc.exists()) {
@@ -500,7 +504,7 @@
             }
         };
 
-        // 🌟 100% 안전한 실시간 데이터 수신 및 모바일 즉시 렌더링
+        // 실시간 데이터 수신 및 렌더링
         const storiesRef = collection(db, 'artifacts', appId, 'public', 'data', 'stories');
         onSnapshot(storiesRef, (snapshot) => {
             const container = document.getElementById('story-list-container');

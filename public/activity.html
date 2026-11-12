@@ -103,7 +103,7 @@
             </div>
         </div>
 
-        <!-- 하단 액션바: 운영자/관리자일 경우 [수정] 버튼과 [전용 게시판 입장하기] 노출 -->
+        <!-- 하단 액션바 -->
         <div class="flex flex-col sm:flex-row items-center gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
             <button id="btn-apply-club" type="button" class="w-full sm:flex-1 py-4 bg-gray-900 text-white rounded-xl font-black text-base hover:bg-gray-800 transition shadow-md active:scale-95">
                 가입 신청하기
@@ -490,33 +490,14 @@
             }
         };
 
+        // 상단 프로필 이름은 components.js가 전역 고정 관리하고, 여기서는 동아리 권한만 체크
         onAuthStateChanged(auth, async (user) => {
-            const btn = document.getElementById('btn-login');
-            const prof = document.getElementById('user-profile');
-
-            if (user && !user.isAnonymous) {
-                if (btn) btn.classList.add('hidden');
-                if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
-
-                let name = user.displayName;
-                try {
-                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
-                    if (profileDoc.exists()) {
-                        name = profileDoc.data().nickname || profileDoc.data().name || name;
+            if (!user) {
+                setTimeout(() => {
+                    if (!auth.currentUser) {
+                        signInAnonymously(auth).catch(() => {});
                     }
-                } catch (e) {}
-
-                name = name || '이웃';
-                const nameEl = document.getElementById('user-name');
-                const avatarEl = document.getElementById('user-avatar');
-                if (nameEl) nameEl.textContent = name + " 님";
-                if (avatarEl) avatarEl.textContent = name.charAt(0);
-            } else {
-                if (btn) btn.classList.remove('hidden');
-                if (prof) prof.classList.add('hidden');
-                if (!user) {
-                    signInAnonymously(auth).catch(() => {});
-                }
+                }, 800);
             }
 
             if (currentClubData) {
@@ -732,10 +713,11 @@
             if (!msg) return alert("신청 포부를 적어주세요!");
 
             try {
+                const savedName = localStorage.getItem('busan_ieum_user_name') || user.displayName || '이웃';
                 await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'memberships', clubId), { status: 'pending', joinedAt: serverTimestamp() });
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'applications'), {
                     userId: user.uid,
-                    userName: user.displayName || '이웃',
+                    userName: savedName,
                     message: msg,
                     createdAt: serverTimestamp()
                 });
@@ -806,11 +788,12 @@
             if (!title || !content) return alert("제목과 내용을 모두 적어주세요!");
 
             try {
+                const savedName = localStorage.getItem('busan_ieum_user_name') || user.displayName || '이웃';
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'posts'), {
                     title,
                     content,
                     imageUrl: uploadedPostImageData || '',
-                    authorName: user.displayName || '이웃',
+                    authorName: savedName,
                     authorId: user.uid,
                     createdAt: serverTimestamp()
                 });

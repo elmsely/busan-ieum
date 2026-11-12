@@ -1,7 +1,8 @@
+// public/firebase-config.js
 // 파이어베이스 핵심 모듈 불러오기
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 // 공통 파이어베이스 프로젝트 설정값
 let firebaseConfig = {
@@ -19,11 +20,14 @@ if (typeof __firebase_config !== 'undefined') {
     firebaseConfig = JSON.parse(__firebase_config);
 }
 
-// 파이어베이스 초기화 (이 파일에서 딱 한 번만 실행됨)
-const app = initializeApp(firebaseConfig);
+// 파이어베이스 초기화 (중복 실행 방지)
+const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'talent-af055';
 
-// 🌟 핵심: 다른 HTML 파일들에서 이 변수들을 가져다 쓸 수 있도록 '수출(export)' 합니다.
+// 페이지 이동 및 새로고침 시에도 로그인 상태 영구 고정
+setPersistence(auth, browserLocalPersistence).catch(() => {});
+
+// 다른 HTML 파일들에서 이 변수들을 가져다 쓸 수 있도록 내보내기(export)
 export { app, db, auth, appId };
