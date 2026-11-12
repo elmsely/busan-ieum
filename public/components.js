@@ -1,6 +1,6 @@
-// public/components.js - 부산이음 사용자 공통 웹 컴포넌트
+// public/components.js - 부산이음 사용자 공통 웹 컴포넌트 (로그인 상태 전역 고정 및 스토리 메뉴 추가 완료)
 
-// 1. 공통 네비게이션 헤더 (모바일 4개 카테고리 탭 완벽 지원!)
+// 1. 공통 네비게이션 헤더 (PC + 모바일 완벽 지원)
 class PublicNav extends HTMLElement {
     connectedCallback() {
         const active = this.getAttribute('active') || 'home';
@@ -12,7 +12,7 @@ class PublicNav extends HTMLElement {
                 : "text-gray-600 hover:text-gray-900 font-medium text-base md:text-lg transition";
         };
 
-        // 모바일 화면용 탭 활성화 클래스 (동글동글 감성 칩 디자인)
+        // 모바일 화면용 탭 활성화 클래스
         const getMobileTabClass = (page) => {
             return active === page
                 ? "px-3.5 py-1.5 rounded-full bg-gray-900 text-white font-black text-xs shadow-sm transition whitespace-nowrap"
@@ -33,11 +33,11 @@ class PublicNav extends HTMLElement {
                              style="height: 44px; max-height: 56px; min-height: 38px;">
                     </a>
 
-                    <!-- PC 전용 상단 메뉴 목록 (태블릿/PC에서 표시) -->
+                    <!-- PC 전용 상단 메뉴 목록 (동아리와 우리기장 사이에 '스토리' 추가!) -->
                     <nav class="hidden md:flex items-center gap-10 h-full">
                         <a href="intro.html" class="${getNavLinkClass('intro')} flex items-center h-full">소개</a>
-                        <a href="busan-ieum.html" class="${getNavLinkClass('busan-ieum')} flex items-center h-full">부산이음</a>
                         <a href="club.html" class="${getNavLinkClass('club')} flex items-center h-full">동아리</a>
+                        <a href="busan-ieum.html" class="${getNavLinkClass('busan-ieum')} flex items-center h-full">스토리</a>
                         <a href="market.html" class="${getNavLinkClass('market')} flex items-center h-full">우리기장</a>
                     </nav>
 
@@ -67,11 +67,11 @@ class PublicNav extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- 🌟 [2단] 모바일 전용 4개 카테고리 메뉴 바 (핸드폰에서 100% 항상 표시!) 🌟 -->
+                <!-- 🌟 [2단] 모바일 전용 카테고리 메뉴 바 (동아리와 우리기장 사이에 '스토리' 추가!) 🌟 -->
                 <div class="md:hidden w-full bg-white border-t border-gray-100 px-3 py-2 flex items-center justify-center gap-2 overflow-x-auto hide-scrollbar shadow-inner">
                     <a href="intro.html" class="${getMobileTabClass('intro')}">소개</a>
-                    <a href="busan-ieum.html" class="${getMobileTabClass('busan-ieum')}">부산이음</a>
                     <a href="club.html" class="${getMobileTabClass('club')}">동아리</a>
+                    <a href="busan-ieum.html" class="${getMobileTabClass('busan-ieum')}">스토리</a>
                     <a href="market.html" class="${getMobileTabClass('market')}">우리기장</a>
                 </div>
 
@@ -92,19 +92,7 @@ class PublicNav extends HTMLElement {
                                 </ul>
                             </div>
 
-                            <!-- 2열: 부산이음 story -->
-                            <div class="px-6">
-                                <h4 class="text-base font-black text-gray-900 mb-3 flex items-center gap-2">
-                                    <i data-lucide="sparkles" class="w-4 h-4 text-rosegold-500"></i> 부산이음
-                                </h4>
-                                <ul class="space-y-2.5 text-sm font-medium text-gray-600">
-                                    <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>함께하는 부산이음 story</a></li>
-                                    <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>우리들의 활동 피드</a></li>
-                                    <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>새 이야기 남기기</a></li>
-                                </ul>
-                            </div>
-
-                            <!-- 3열: 동아리 -->
+                            <!-- 2열: 동아리 -->
                             <div class="px-6">
                                 <h4 class="text-base font-black text-gray-900 mb-3 flex items-center gap-2">
                                     <i data-lucide="users" class="w-4 h-4 text-rosegold-500"></i> 동아리
@@ -113,6 +101,18 @@ class PublicNav extends HTMLElement {
                                     <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>손수 (공예/만들기)</a></li>
                                     <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>몸소 (활동/건강)</a></li>
                                     <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>그 외 나눔 동아리</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- 3열: 스토리 -->
+                            <div class="px-6">
+                                <h4 class="text-base font-black text-gray-900 mb-3 flex items-center gap-2">
+                                    <i data-lucide="sparkles" class="w-4 h-4 text-rosegold-500"></i> 스토리
+                                </h4>
+                                <ul class="space-y-2.5 text-sm font-medium text-gray-600">
+                                    <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>함께하는 부산이음 story</a></li>
+                                    <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>우리들의 활동 피드</a></li>
+                                    <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>새 이야기 남기기</a></li>
                                 </ul>
                             </div>
 
@@ -134,6 +134,9 @@ class PublicNav extends HTMLElement {
             </header>
         `;
         if (window.lucide) window.lucide.createIcons();
+        
+        // 헤더가 그려지자마자 전역 로그인 상태 감지기 실행!
+        window.initGlobalAuthListener();
     }
 }
 
@@ -155,7 +158,7 @@ class PublicFooter extends HTMLElement {
     }
 }
 
-// 3. 공통 모달 (로그인, 비밀번호 재설정 등)
+// 3. 공통 모달 (로그인, 비밀번호 재설정, 회원가입)
 class PublicModals extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
@@ -366,11 +369,11 @@ window.closeResetPasswordModal = () => {
     if (resetEmail) resetEmail.value = '';
 };
 
-// Firebase 인증 인스턴스 로더
+// Firebase 인증 인스턴스 로더 (브라우저 로컬 지속성 보장)
 const getFirebaseAuthInstances = async () => {
     const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
-    const { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
-    const { getFirestore, doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+    const { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+    const { getFirestore, doc, getDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
 
     const firebaseConfig = { 
         apiKey: "AIzaSyAoiX0R0hJoWYqyy52Y6sFWIxwPoljR_7k", 
@@ -385,7 +388,77 @@ const getFirebaseAuthInstances = async () => {
     const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    return { auth, db, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut, setDoc, doc, serverTimestamp };
+    const appId = 'talent-af055';
+
+    // 페이지를 이동하거나 새로고침해도 로그인 상태를 브라우저에 영구 유지하도록 고정!
+    await setPersistence(auth, browserLocalPersistence).catch(() => {});
+
+    return { auth, db, appId, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut, onAuthStateChanged, getDoc, setDoc, doc, serverTimestamp };
+};
+
+// 🌟 모든 페이지에서 계정이 고정되도록 통합 관리하는 전역 인증 감지기 🌟
+let isGlobalAuthInitialized = false;
+window.initGlobalAuthListener = async () => {
+    if (isGlobalAuthInitialized) return;
+    isGlobalAuthInitialized = true;
+
+    try {
+        const { auth, db, appId, onAuthStateChanged, getDoc, doc } = await getFirebaseAuthInstances();
+
+        // 직전에 저장된 닉네임이 있다면 화면 깜빡임 없이 즉시 먼저 표시 (초고속 UX)
+        const cachedName = localStorage.getItem('busan_ieum_user_name');
+        if (cachedName) {
+            const btn = document.getElementById('btn-login');
+            const prof = document.getElementById('user-profile');
+            const nameEl = document.getElementById('user-name');
+            const avatarEl = document.getElementById('user-avatar');
+            if (btn) btn.classList.add('hidden');
+            if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
+            if (nameEl) nameEl.textContent = cachedName + " 님";
+            if (avatarEl) avatarEl.textContent = cachedName.charAt(0);
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            const btn = document.getElementById('btn-login');
+            const prof = document.getElementById('user-profile');
+
+            // 실제 정식 로그인 회원일 경우 (!user.isAnonymous)
+            if (user && !user.isAnonymous) {
+                if (btn) btn.classList.add('hidden');
+                if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
+
+                let resolvedName = user.displayName;
+                if (user.email === 'admin@internal.system') {
+                    resolvedName = '최고관리자';
+                }
+
+                try {
+                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                    if (profileDoc.exists()) {
+                        const data = profileDoc.data();
+                        resolvedName = data.nickname || data.name || resolvedName;
+                    }
+                } catch (e) {
+                    console.warn("프로필 조회 대기:", e);
+                }
+
+                resolvedName = resolvedName || '이웃';
+                localStorage.setItem('busan_ieum_user_name', resolvedName);
+
+                const nameEl = document.getElementById('user-name');
+                const avatarEl = document.getElementById('user-avatar');
+                if (nameEl) nameEl.textContent = resolvedName + " 님";
+                if (avatarEl) avatarEl.textContent = resolvedName.charAt(0);
+            } else {
+                // 비로그인 또는 익명 손님 상태일 경우
+                localStorage.removeItem('busan_ieum_user_name');
+                if (btn) btn.classList.remove('hidden');
+                if (prof) { prof.classList.add('hidden'); prof.classList.remove('flex'); }
+            }
+        });
+    } catch (err) {
+        console.error("전역 인증 감지기 초기화 오류:", err);
+    }
 };
 
 // 이메일 로그인
@@ -412,16 +485,74 @@ window.loginWithEmail = async () => {
     }
 };
 
+// 일반 이메일 회원가입 처리
+window.submitEmailRegister = async () => {
+    const email = document.getElementById('reg-email')?.value.trim();
+    const pw = document.getElementById('reg-pw')?.value.trim();
+    const name = document.getElementById('reg-name')?.value.trim();
+    const nickname = document.getElementById('reg-nickname')?.value.trim();
+    const phone = document.getElementById('reg-phone')?.value.trim();
+
+    if (!email || !pw || !name || !nickname) {
+        return alert("이메일, 비밀번호, 이름, 별명을 모두 입력해 주세요! ✍️");
+    }
+
+    try {
+        const { auth, db, appId, createUserWithEmailAndPassword, updateProfile, setDoc, doc, serverTimestamp } = await getFirebaseAuthInstances();
+        const cred = await createUserWithEmailAndPassword(auth, email, pw);
+        await updateProfile(cred.user, { displayName: nickname });
+        await setDoc(doc(db, 'artifacts', appId, 'users', cred.user.uid, 'profile', 'info'), {
+            email, name, nickname, phone: phone || '', createdAt: serverTimestamp()
+        });
+        window.closeEmailRegisterModal();
+        alert(`🎉 [${nickname}] 님, 부산이음 회원이 되신 것을 환영합니다!`);
+    } catch (err) {
+        console.error("회원가입 실패:", err);
+        alert("회원가입 중 오류가 발생했습니다. 이미 사용 중인 이메일이거나 비밀번호가 6자리 미만인지 확인해 주세요.");
+    }
+};
+
 // 구글 로그인
 window.loginWithGoogle = async () => {
     try {
-        const { auth, GoogleAuthProvider, signInWithPopup } = await getFirebaseAuthInstances();
+        const { auth, db, appId, GoogleAuthProvider, signInWithPopup, getDoc, doc } = await getFirebaseAuthInstances();
         const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
+        const cred = await signInWithPopup(auth, provider);
         window.closeLoginModal();
+
+        const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', cred.user.uid, 'profile', 'info'));
+        if (!profileDoc.exists()) {
+            const gModal = document.getElementById('modal-google-register');
+            if (gModal) gModal.classList.remove('hidden');
+        }
     } catch (err) {
         console.error("구글 로그인 실패:", err);
         alert("구글 로그인에 실패했습니다. 다시 시도해 주세요.");
+    }
+};
+
+// 구글 추가 정보 저장
+window.submitGoogleRegister = async () => {
+    const name = document.getElementById('g-reg-name')?.value.trim();
+    const nickname = document.getElementById('g-reg-nickname')?.value.trim();
+    const phone = document.getElementById('g-reg-phone')?.value.trim();
+
+    if (!name || !nickname) return alert("이름과 활동 닉네임을 입력해 주세요!");
+
+    try {
+        const { auth, db, appId, updateProfile, setDoc, doc, serverTimestamp } = await getFirebaseAuthInstances();
+        if (!auth.currentUser) return;
+        await updateProfile(auth.currentUser, { displayName: nickname });
+        await setDoc(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'info'), {
+            email: auth.currentUser.email || '', name, nickname, phone: phone || '', createdAt: serverTimestamp()
+        });
+        localStorage.setItem('busan_ieum_user_name', nickname);
+        window.closeGoogleRegisterModal();
+        alert(`🎉 [${nickname}] 님, 가입이 완료되었습니다!`);
+        location.reload();
+    } catch (err) {
+        console.error(err);
+        alert("정보 저장 중 오류가 발생했습니다.");
     }
 };
 
@@ -455,6 +586,7 @@ window.handleSendPasswordReset = async () => {
 window.logout = async () => {
     try {
         const { auth, signOut } = await getFirebaseAuthInstances();
+        localStorage.removeItem('busan_ieum_user_name');
         await signOut(auth);
         alert("안전하게 로그아웃되었습니다.");
         location.reload();

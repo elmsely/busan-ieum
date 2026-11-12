@@ -255,9 +255,14 @@
 
         lucide.createIcons();
 
+        // 정식 회원 세션을 덮어쓰지 않도록 안전하게 대기 후 비로그인 시에만 익명 읽기 권한 연결
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                signInAnonymously(auth).catch(() => {});
+                setTimeout(() => {
+                    if (!auth.currentUser) {
+                        signInAnonymously(auth).catch(() => {});
+                    }
+                }, 800);
             }
         });
 
@@ -403,12 +408,13 @@
             if(!titleVal || !contentVal) { return alert("제목과 상세 이야기를 모두 적어주세요! ✍️"); }
             
             try {
+                const savedName = localStorage.getItem('busan_ieum_user_name') || user.displayName || "이웃";
                 const postPayload = { 
                     title: titleVal, 
                     category: categoryVal, 
                     content: contentVal, 
                     imageUrl: currentPostImageData || '',
-                    authorName: user.displayName || "이웃", 
+                    authorName: savedName, 
                     authorId: user.uid, 
                     createdAt: serverTimestamp(), 
                     likes: 0, 
@@ -538,6 +544,7 @@
             
             lucide.createIcons();
         });
+        
     </script>
 </body>
 </html>
