@@ -4,6 +4,12 @@
 class PublicNav extends HTMLElement {
     connectedCallback() {
         const active = this.getAttribute('active') || 'home';
+        const links = [
+            ['intro', 'intro.html', '소개'],
+            ['busan-ieum', 'busan-ieum.html', '스토리'],
+            ['club', 'club.html', '동아리'],
+            ['market', 'market.html', '우리기장']
+        ];
         
         // PC 화면용 활성화 클래스
         const getNavLinkClass = (page) => {
@@ -24,7 +30,7 @@ class PublicNav extends HTMLElement {
             <header class="group fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-50 transition-all shadow-sm">
                 
                 <!-- [1단] 상단 로고 & 사용자 프로필 / 로그인 바 -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative z-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 grid grid-cols-[auto_1fr] md:grid-cols-[1fr_auto_1fr] items-center relative z-20 bg-white">
                     
                     <!-- 공식 로고 -->
                     <a href="index.html" class="flex items-center py-1 overflow-visible focus:outline-none">
@@ -33,17 +39,14 @@ class PublicNav extends HTMLElement {
                              style="height: 44px; max-height: 56px; min-height: 38px;">
                     </a>
 
-                    <!-- PC 전용 상단 메뉴 목록 (동아리와 우리기장 사이에 '스토리' 추가!) -->
-                    <nav class="hidden md:flex items-center gap-10 h-full">
-                        <a href="intro.html" class="${getNavLinkClass('intro')} flex items-center h-full">소개</a>
-                        <a href="club.html" class="${getNavLinkClass('club')} flex items-center h-full">동아리</a>
-                        <a href="busan-ieum.html" class="${getNavLinkClass('busan-ieum')} flex items-center h-full">스토리</a>
-                        <a href="market.html" class="${getNavLinkClass('market')} flex items-center h-full">우리기장</a>
+                    <!-- 모든 페이지에서 같은 순서와 위치를 사용하는 PC 메뉴 -->
+                    <nav aria-label="주 메뉴" class="hidden md:flex items-center gap-6 lg:gap-10 h-full">
+                        ${links.map(([page, href, label]) => `<a href="${href}" ${active === page ? 'aria-current="page"' : ''} class="${getNavLinkClass(page)} flex items-center h-full">${label}</a>`).join('')}
                     </nav>
 
                     <!-- 우측 계정 및 액션 버튼 -->
-                    <div class="flex items-center gap-2.5 sm:gap-4">
-                        <button id="btn-login" onclick="window.openLoginModal()" class="text-xs sm:text-base font-bold text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-xl transition">
+                    <div data-auth-controls aria-busy="true" class="flex items-center justify-self-end gap-2.5 sm:gap-4">
+                        <button id="btn-login" onclick="window.openLoginModal()" class="hidden text-xs sm:text-base font-bold text-gray-700 hover:text-gray-900 px-3 py-1.5 rounded-xl transition">
                             로그인
                         </button>
                         
@@ -67,13 +70,10 @@ class PublicNav extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- 🌟 [2단] 모바일 전용 카테고리 메뉴 바 (동아리와 우리기장 사이에 '스토리' 추가!) 🌟 -->
-                <div class="md:hidden w-full bg-white border-t border-gray-100 px-3 py-2 flex items-center justify-center gap-2 overflow-x-auto hide-scrollbar shadow-inner">
-                    <a href="intro.html" class="${getMobileTabClass('intro')}">소개</a>
-                    <a href="club.html" class="${getMobileTabClass('club')}">동아리</a>
-                    <a href="busan-ieum.html" class="${getMobileTabClass('busan-ieum')}">스토리</a>
-                    <a href="market.html" class="${getMobileTabClass('market')}">우리기장</a>
-                </div>
+                <!-- 모바일에서도 같은 순서로 표시 -->
+                <nav aria-label="모바일 주 메뉴" class="md:hidden w-full bg-white border-t border-gray-100 px-3 py-2 flex items-center justify-center gap-2 overflow-x-auto hide-scrollbar shadow-inner">
+                    ${links.map(([page, href, label]) => `<a href="${href}" ${active === page ? 'aria-current="page"' : ''} class="${getMobileTabClass(page)}">${label}</a>`).join('')}
+                </nav>
 
                 <!-- PC 전용 메가 메뉴 드롭다운 패널 -->
                 <div class="hidden md:block absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-xl opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-300 ease-out z-10">
@@ -92,19 +92,7 @@ class PublicNav extends HTMLElement {
                                 </ul>
                             </div>
 
-                            <!-- 2열: 동아리 -->
-                            <div class="px-6">
-                                <h4 class="text-base font-black text-gray-900 mb-3 flex items-center gap-2">
-                                    <i data-lucide="users" class="w-4 h-4 text-rosegold-500"></i> 동아리
-                                </h4>
-                                <ul class="space-y-2.5 text-sm font-medium text-gray-600">
-                                    <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>손수 (공예/만들기)</a></li>
-                                    <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>몸소 (활동/건강)</a></li>
-                                    <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>그 외 나눔 동아리</a></li>
-                                </ul>
-                            </div>
-
-                            <!-- 3열: 스토리 -->
+                            <!-- 2열: 스토리 -->
                             <div class="px-6">
                                 <h4 class="text-base font-black text-gray-900 mb-3 flex items-center gap-2">
                                     <i data-lucide="sparkles" class="w-4 h-4 text-rosegold-500"></i> 스토리
@@ -113,6 +101,18 @@ class PublicNav extends HTMLElement {
                                     <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>함께하는 부산이음 story</a></li>
                                     <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>우리들의 활동 피드</a></li>
                                     <li><a href="busan-ieum.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>새 이야기 남기기</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- 3열: 동아리 -->
+                            <div class="px-6">
+                                <h4 class="text-base font-black text-gray-900 mb-3 flex items-center gap-2">
+                                    <i data-lucide="users" class="w-4 h-4 text-rosegold-500"></i> 동아리
+                                </h4>
+                                <ul class="space-y-2.5 text-sm font-medium text-gray-600">
+                                    <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>손수 (공예/만들기)</a></li>
+                                    <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>몸소 (활동/건강)</a></li>
+                                    <li><a href="club.html" class="hover:text-rosegold-600 hover:font-bold transition flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-gray-300"></span>그 외 나눔 동아리</a></li>
                                 </ul>
                             </div>
 
@@ -369,95 +369,68 @@ window.closeResetPasswordModal = () => {
     if (resetEmail) resetEmail.value = '';
 };
 
-// Firebase 인증 인스턴스 로더 (브라우저 로컬 지속성 보장)
-const getFirebaseAuthInstances = async () => {
-    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
-    const { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
-    const { getFirestore, doc, getDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAoiX0R0hJoWYqyy52Y6sFWIxwPoljR_7k", 
-        authDomain: "talent.unifactory.kr", 
-        projectId: "talent-af055", 
-        storageBucket: "talent-af055.firebasestorage.app", 
-        messagingSenderId: "476130735120", 
-        appId: "1:476130735120:web:aae71ccf3e626152e40695", 
-        measurementId: "G-1XSNXNNGMH" 
-    };
-
-    const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const appId = 'talent-af055';
-
-    // 페이지를 이동하거나 새로고침해도 로그인 상태를 브라우저에 영구 유지하도록 고정!
-    await setPersistence(auth, browserLocalPersistence).catch(() => {});
-
-    return { auth, db, appId, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut, onAuthStateChanged, getDoc, setDoc, doc, serverTimestamp };
+// 페이지와 공통 헤더가 같은 Firebase 인스턴스 및 로그인 저장 방식을 사용합니다.
+let firebaseAuthInstances;
+const getFirebaseAuthInstances = () => {
+    if (!firebaseAuthInstances) {
+        firebaseAuthInstances = (async () => {
+            const { auth, db, appId, authReady } = await import('./firebase-config.js');
+            const authApi = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+            const { doc, getDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+            await authReady;
+            return { ...authApi, auth, db, appId, doc, getDoc, setDoc, serverTimestamp };
+        })().catch(error => { firebaseAuthInstances = undefined; throw error; });
+    }
+    return firebaseAuthInstances;
 };
 
-// 🌟 모든 페이지에서 계정이 고정되도록 통합 관리하는 전역 인증 감지기 🌟
+// 헤더의 로그인 표시는 공통 감지기 한 곳에서만 갱신합니다.
 let isGlobalAuthInitialized = false;
 window.initGlobalAuthListener = async () => {
     if (isGlobalAuthInitialized) return;
     isGlobalAuthInitialized = true;
-
+    const renderAccount = (name) => {
+        document.querySelectorAll('public-nav').forEach(nav => {
+            nav.querySelector('#btn-login')?.classList.toggle('hidden', Boolean(name));
+            const profile = nav.querySelector('#user-profile');
+            profile?.classList.toggle('hidden', !name);
+            profile?.classList.toggle('flex', Boolean(name));
+            if (name) {
+                nav.querySelector('#user-name').textContent = name + ' 님';
+                nav.querySelector('#user-avatar').textContent = name.charAt(0);
+            }
+            nav.querySelector('[data-auth-controls]')?.setAttribute('aria-busy', 'false');
+        });
+    };
     try {
         const { auth, db, appId, onAuthStateChanged, getDoc, doc } = await getFirebaseAuthInstances();
-
-        // 직전에 저장된 닉네임이 있다면 화면 깜빡임 없이 즉시 먼저 표시 (초고속 UX)
-        const cachedName = localStorage.getItem('busan_ieum_user_name');
-        if (cachedName) {
-            const btn = document.getElementById('btn-login');
-            const prof = document.getElementById('user-profile');
-            const nameEl = document.getElementById('user-name');
-            const avatarEl = document.getElementById('user-avatar');
-            if (btn) btn.classList.add('hidden');
-            if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
-            if (nameEl) nameEl.textContent = cachedName + " 님";
-            if (avatarEl) avatarEl.textContent = cachedName.charAt(0);
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            const btn = document.getElementById('btn-login');
-            const prof = document.getElementById('user-profile');
-
-            // 실제 정식 로그인 회원일 경우 (!user.isAnonymous)
-            if (user && !user.isAnonymous) {
-                if (btn) btn.classList.add('hidden');
-                if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
-
-                let resolvedName = user.displayName;
-                if (user.email === 'admin@internal.system') {
-                    resolvedName = '최고관리자';
-                }
-
-                try {
-                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
-                    if (profileDoc.exists()) {
-                        const data = profileDoc.data();
-                        resolvedName = data.nickname || data.name || resolvedName;
-                    }
-                } catch (e) {
-                    console.warn("프로필 조회 대기:", e);
-                }
-
-                resolvedName = resolvedName || '이웃';
-                localStorage.setItem('busan_ieum_user_name', resolvedName);
-
-                const nameEl = document.getElementById('user-name');
-                const avatarEl = document.getElementById('user-avatar');
-                if (nameEl) nameEl.textContent = resolvedName + " 님";
-                if (avatarEl) avatarEl.textContent = resolvedName.charAt(0);
-            } else {
-                // 비로그인 또는 익명 손님 상태일 경우
+        let revision = 0;
+        onAuthStateChanged(auth, async user => {
+            const currentRevision = ++revision;
+            if (!user || user.isAnonymous) {
                 localStorage.removeItem('busan_ieum_user_name');
-                if (btn) btn.classList.remove('hidden');
-                if (prof) { prof.classList.add('hidden'); prof.classList.remove('flex'); }
+                window.currentUserName = '';
+                renderAccount(null);
+                return;
             }
+            const fallback = user.email === 'admin@internal.system' ? '최고관리자' : (user.displayName || '이웃');
+            window.currentUserName = fallback;
+            renderAccount(fallback);
+            let name = fallback;
+            try {
+                const profile = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
+                if (profile.exists()) name = profile.data().nickname || profile.data().name || fallback;
+            } catch (error) { console.warn('프로필 조회 실패:', error); }
+            // 로그아웃/계정 전환 이후 도착한 이전 프로필 응답은 표시하지 않습니다.
+            if (revision !== currentRevision || auth.currentUser?.uid !== user.uid) return;
+            localStorage.setItem('busan_ieum_user_name', name);
+            window.currentUserName = name;
+            renderAccount(name);
         });
-    } catch (err) {
-        console.error("전역 인증 감지기 초기화 오류:", err);
+    } catch (error) {
+        isGlobalAuthInitialized = false;
+        renderAccount(null);
+        console.error('전역 인증 감지기 초기화 오류:', error);
     }
 };
 

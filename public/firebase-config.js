@@ -27,7 +27,7 @@ const auth = getAuth(app);
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'talent-af055';
 
 // 페이지 이동 및 새로고침 시에도 로그인 상태 영구 고정
-setPersistence(auth, browserLocalPersistence).catch(() => {});
+const authReady = setPersistence(auth, browserLocalPersistence).catch(() => {});
 
 // 다른 HTML 파일들에서 이 변수들을 가져다 쓸 수 있도록 내보내기(export)
-export { app, db, auth, appId };
+export { app, db, auth, appId, authReady };

@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <!-- 사용자 공통 컴포넌트 -->
-    <script src="components.js"></script>
+    <script src="components.js?v=20261113-nav2"></script>
 
     <script>
         tailwind.config = {
@@ -319,35 +319,9 @@
             lucide.createIcons();
         }
 
-        // 🌟 2. 인증 상태 감지 (비회원 손님도 즉시 볼 수 있게 게스트 인증 보장)
-        onAuthStateChanged(auth, async (user) => {
-            const btn = document.getElementById('btn-login');
-            const prof = document.getElementById('user-profile');
-
-            if (user && !user.isAnonymous) {
-                if (btn) btn.classList.add('hidden');
-                if (prof) { prof.classList.remove('hidden'); prof.classList.add('flex'); }
-
-                let name = user.displayName;
-                try {
-                    const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'info'));
-                    if (profileDoc.exists()) {
-                        name = profileDoc.data().nickname || profileDoc.data().name || name;
-                    }
-                } catch (e) { console.error(e); }
-
-                name = name || '이웃';
-                const nameEl = document.getElementById('user-name');
-                const avatarEl = document.getElementById('user-avatar');
-                if (nameEl) nameEl.textContent = name + " 님";
-                if (avatarEl) avatarEl.textContent = name.charAt(0);
-            } else {
-                if (btn) btn.classList.remove('hidden');
-                if (prof) prof.classList.add('hidden');
-                if (!user) {
-                    signInAnonymously(auth).catch(() => {});
-                }
-            }
+        // 동아리 권한과 목록만 갱신하고, 계정 표시는 공통 헤더에서 관리합니다.
+        onAuthStateChanged(auth, user => {
+            if (!user) signInAnonymously(auth).catch(console.error);
             renderClubs();
         });
 
